@@ -1,12 +1,12 @@
 {
-  "name": "chapterwise-codex-marketplace",
+  "name": "chapterwise-plugins",
   "owner": {
     "name": "Anson Phong",
     "email": "phong@phong.com"
   },
   "metadata": {
     "version": "1.0.0",
-    "description": "Chapterwise Codex plugin for Claude Code"
+    "description": "ChapterWise plugins for Claude Code"
   },
   "plugins": [
     {
