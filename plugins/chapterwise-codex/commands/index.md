@@ -1,5 +1,5 @@
 ---
-description: Generate and manage index.codex.yaml files for Chapterwise Git projects. Use when user says "generate index", "create index", "codex index", or wants to set up a Chapterwise project structure.
+description: Generate an index.codex.yaml for your project
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 disable-model-invocation: true
 triggers:

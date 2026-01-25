@@ -1,5 +1,5 @@
 ---
-description: Create and manage Codex Lite files (Markdown with YAML frontmatter). Use when user says "codex lite", "markdown frontmatter", "lite format", or wants to add Chapterwise metadata to Markdown files.
+description: Create Codex Lite files (Markdown with YAML frontmatter)
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - codex lite

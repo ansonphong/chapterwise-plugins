@@ -1,5 +1,5 @@
 ---
-description: Merge included files back into a parent codex document. Use when user says "implode codex", "merge includes", "consolidate codex", "inline includes", or wants to combine modular codex files into a single file.
+description: Merge separate codex files back into one document
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - implode codex

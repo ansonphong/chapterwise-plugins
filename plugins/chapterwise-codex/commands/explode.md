@@ -1,5 +1,5 @@
 ---
-description: Extract children from a codex file into separate files and replace them with include directives. Use when user says "explode codex", "split codex", "modularize codex", "extract children", or wants to break a large codex into smaller files.
+description: Split a codex file into separate files for each child element
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - explode codex

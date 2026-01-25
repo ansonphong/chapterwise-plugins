@@ -1,5 +1,5 @@
 ---
-description: Convert content to Chapterwise Codex V1.2 format and run the auto-fixer. Use when user says "codex format", "chapterwise codex", "format this codex", "fix this codex", or wants to structure/validate any content for Chapterwise.
+description: Convert content to Chapterwise Codex format and fix formatting issues
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - codex format
