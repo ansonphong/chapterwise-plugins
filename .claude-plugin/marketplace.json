@@ -1,0 +1,24 @@
+{
+  "owner": {
+    "name": "Anson Phong",
+    "email": "anson@studiophong.com"
+  },
+  "metadata": {
+    "name": "chapterwise-codex-marketplace",
+    "version": "1.0.0",
+    "description": "Chapterwise Codex plugin for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "chapterwise-codex",
+      "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
+      "version": "1.0.0",
+      "source": {
+        "type": "local",
+        "path": "."
+      },
+      "tags": ["codex", "yaml", "document-management", "storytelling"],
+      "category": "productivity"
+    }
+  ]
+}
