@@ -13,7 +13,7 @@
       "name": "chapterwise-codex",
       "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
       "version": "1.0.0",
-      "source": ".",
+      "source": "./plugins/chapterwise-codex",
       "tags": ["codex", "yaml", "document-management", "storytelling"],
       "category": "productivity"
     }
