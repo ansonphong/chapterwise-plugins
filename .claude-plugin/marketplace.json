@@ -13,10 +13,7 @@
       "name": "chapterwise-codex",
       "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
       "version": "1.0.0",
-      "source": {
-        "type": "github",
-        "repo": "ansonphong/chapterwise-codex-claude"
-      },
+      "source": ".",
       "tags": ["codex", "yaml", "document-management", "storytelling"],
       "category": "productivity"
     }
