@@ -1,5 +1,4 @@
 ---
-name: lite
 description: Create and manage Codex Lite files (Markdown with YAML frontmatter). Use when user says "codex lite", "markdown frontmatter", "lite format", or wants to add Chapterwise metadata to Markdown files.
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
@@ -52,7 +51,6 @@ A bare Markdown file with no frontmatter is valid Codex Lite. Add fields as need
 ```markdown
 ---
 type: document
-name: "Document Title"
 summary: "Brief one-line description"
 tags: tag1, tag2, tag3
 status: private
@@ -130,7 +128,6 @@ When displaying, Chapterwise uses this order:
 ```markdown
 ---
 type: character
-name: "Maya Chen"
 summary: "A quantum physicist who discovers her memories span multiple timelines"
 tags: protagonist, scientist, multiverse
 status: draft
@@ -153,7 +150,6 @@ She's driven by curiosity...
 ```markdown
 ---
 type: location
-name: "The Nexus"
 summary: "A convergence point between parallel timelines"
 tags: setting, multiverse, key-location
 ---

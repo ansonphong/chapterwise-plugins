@@ -1,5 +1,4 @@
 ---
-name: format
 description: Convert content to Chapterwise Codex V1.2 format and run the auto-fixer. Use when user says "codex format", "chapterwise codex", "format this codex", "fix this codex", or wants to structure/validate any content for Chapterwise.
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
@@ -54,7 +53,6 @@ metadata:
 
 id: "[unique-id]"
 type: "[your-custom-type]"  # ANY string: recipe, workout, meeting, research, playlist, etc.
-name: "[Name]"
 title: "[Display Title]"
 summary: "[One-line description]"
 status: draft
@@ -189,7 +187,6 @@ metadata:
 
 id: "[venue-slug]"
 type: venue
-name: "[Venue Name]"
 title: "[Display Name with Emoji]"
 summary: "[One-line venue description]"
 status: private
@@ -255,7 +252,6 @@ metadata:
 
 id: "[uuid-v4]"
 type: character
-name: "[Character Name]"
 summary: "[One-line character description]"
 status: draft
 featured: true

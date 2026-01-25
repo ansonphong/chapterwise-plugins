@@ -1,5 +1,4 @@
 ---
-name: implode
 description: Merge included files back into a parent codex document. Use when user says "implode codex", "merge includes", "consolidate codex", "inline includes", or wants to combine modular codex files into a single file.
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
@@ -63,7 +62,6 @@ metadata:
 
 id: story-001
 type: story
-name: "Epic Tale"
 
 children:
   - include: "/characters/Hero.codex.yaml"
@@ -89,7 +87,6 @@ metadata:
 
 id: story-001
 type: story
-name: "Epic Tale"
 
 children:
   - id: char-001

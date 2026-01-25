@@ -1,5 +1,4 @@
 ---
-name: index
 description: Generate and manage index.codex.yaml files for Chapterwise Git projects. Use when user says "generate index", "create index", "codex index", or wants to set up a Chapterwise project structure.
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 disable-model-invocation: true
@@ -49,7 +48,6 @@ metadata:
 
 id: index-root
 type: index
-name: "my-project"
 title: "My Project"
 summary: "Project description here"
 status: private
@@ -77,7 +75,6 @@ metadata:
 
 id: index-root
 type: index
-name: "project-name"
 title: "Display Title"
 summary: "One-line project description"
 status: private
