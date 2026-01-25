@@ -24,20 +24,20 @@ Extract children from a codex file into separate standalone files and replace th
 ## Script Location
 
 ```
-${CLAUDE_PLUGIN_ROOT}/skills/explode/explode_codex.py
+${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py
 ```
 
 ## Quick Start
 
 ```bash
 # Extract all characters and locations
-python explode_codex.py story.codex.yaml --types character,location
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character,location
 
 # Preview without making changes
-python explode_codex.py story.codex.yaml --types character --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character --dry-run
 
 # Extract ALL direct children
-python explode_codex.py story.codex.yaml
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml
 ```
 
 ## What It Does
@@ -77,7 +77,7 @@ children:
     name: "Chapter 1"
 ```
 
-**Run:** `python explode_codex.py story.codex.yaml --types character,location`
+**Run:** `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character,location`
 
 **After (story.codex.yaml):**
 ```yaml
@@ -107,25 +107,25 @@ children:
 
 ```bash
 # Basic: extract specific types
-python explode_codex.py story.codex.yaml --types character,location
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character,location
 
 # Custom output pattern with placeholders
-python explode_codex.py story.codex.yaml --types character --output-pattern "./nodes/{type}/{name}.codex.yaml"
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character --output-pattern "./nodes/{type}/{name}.codex.yaml"
 
 # Preview what would be extracted (no changes made)
-python explode_codex.py story.codex.yaml --types character --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character --dry-run
 
 # Extract ALL direct children (no type filter)
-python explode_codex.py story.codex.yaml
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml
 
 # Disable auto-fix on extracted files
-python explode_codex.py story.codex.yaml --types character --no-auto-fix
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character --no-auto-fix
 
 # Force overwrite existing files
-python explode_codex.py story.codex.yaml --types character --force
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character --force
 
 # Verbose output
-python explode_codex.py story.codex.yaml -v
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml -v
 ```
 
 ## Output Pattern Placeholders
@@ -186,7 +186,7 @@ else:
 ```
 1. Build your codex with all content inline
 2. When it gets large, run explode to modularize:
-   python explode_codex.py myproject.codex.yaml --types character,location
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py myproject.codex.yaml --types character,location
 3. Edit individual files as needed
 4. Parent file auto-includes them via include directives
 5. Run auto-fixer on edits as usual
@@ -205,8 +205,8 @@ else:
 
 | Scenario | Command |
 |----------|---------|
-| Extract all characters | `python explode_codex.py story.codex.yaml --types character` |
-| Extract characters and locations | `python explode_codex.py story.codex.yaml --types character,location` |
-| Extract everything | `python explode_codex.py story.codex.yaml` |
-| Preview extraction | `python explode_codex.py story.codex.yaml --dry-run` |
-| Custom folder structure | `python explode_codex.py story.codex.yaml --output-pattern "./content/{type}/{name}.codex.yaml"` |
+| Extract all characters | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character` |
+| Extract characters and locations | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --types character,location` |
+| Extract everything | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml` |
+| Preview extraction | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --dry-run` |
+| Custom folder structure | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --output-pattern "./content/{type}/{name}.codex.yaml"` |

@@ -24,20 +24,20 @@ Resolve `include:` directives in a codex file, reading the referenced files and 
 ## Script Location
 
 ```
-${CLAUDE_PLUGIN_ROOT}/skills/implode/implode_codex.py
+${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py
 ```
 
 ## Quick Start
 
 ```bash
 # Merge all includes back into parent
-python implode_codex.py story.codex.yaml
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml
 
 # Preview what would be merged (no changes made)
-python implode_codex.py story.codex.yaml --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml --dry-run
 
 # Merge and delete source files
-python implode_codex.py story.codex.yaml --delete-sources
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml --delete-sources
 ```
 
 ## What It Does
@@ -75,7 +75,7 @@ children:
 - `./characters/Hero.codex.yaml` (contains character data with its own metadata)
 - `./locations/Castle.codex.yaml` (contains location data with its own metadata)
 
-**Run:** `python implode_codex.py story.codex.yaml`
+**Run:** `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml`
 
 **After (story.codex.yaml - consolidated):**
 ```yaml
@@ -110,28 +110,28 @@ children:
 
 ```bash
 # Basic: merge all includes
-python implode_codex.py story.codex.yaml
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml
 
 # Preview what would be merged (no changes made)
-python implode_codex.py story.codex.yaml --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml --dry-run
 
 # Merge and delete the original included files
-python implode_codex.py story.codex.yaml --delete-sources
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml --delete-sources
 
 # Also delete folders that become empty
-python implode_codex.py story.codex.yaml --delete-sources --delete-empty-folders
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml --delete-sources --delete-empty-folders
 
 # Recursive: resolve nested includes (includes within included files)
-python implode_codex.py story.codex.yaml --recursive
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml --recursive
 
 # Skip backup creation
-python implode_codex.py story.codex.yaml --no-backup
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml --no-backup
 
 # Verbose output
-python implode_codex.py story.codex.yaml -v
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml -v
 
 # Combine options
-python implode_codex.py story.codex.yaml --recursive --delete-sources --delete-empty-folders -v
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py story.codex.yaml --recursive --delete-sources --delete-empty-folders -v
 ```
 
 ## Options Reference
@@ -192,22 +192,22 @@ for path in paths:
 ### Archive a Project
 ```bash
 # Consolidate everything into one file for archival
-python implode_codex.py project.codex.yaml --recursive --delete-sources --delete-empty-folders
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py project.codex.yaml --recursive --delete-sources --delete-empty-folders
 ```
 
 ### Create Distribution Copy
 ```bash
 # Make a self-contained copy without modifying originals
 cp project.codex.yaml project-dist.codex.yaml
-python implode_codex.py project-dist.codex.yaml --recursive
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py project-dist.codex.yaml --recursive
 ```
 
 ### Preview Before Merging
 ```bash
 # Always preview first with large projects
-python implode_codex.py project.codex.yaml --dry-run -v
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py project.codex.yaml --dry-run -v
 # Then execute
-python implode_codex.py project.codex.yaml
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py project.codex.yaml
 ```
 
 ## Include Path Resolution
@@ -236,9 +236,9 @@ python implode_codex.py project.codex.yaml
 ```
 1. Start with inline content
 2. Run explode to modularize:
-   python explode_codex.py project.codex.yaml --types character,location
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py project.codex.yaml --types character,location
 3. Work on individual files
 4. Run implode to consolidate:
-   python implode_codex.py project.codex.yaml --delete-sources
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py project.codex.yaml --delete-sources
 5. Back to single file
 ```

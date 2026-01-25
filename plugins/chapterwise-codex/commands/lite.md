@@ -39,7 +39,7 @@ Add Chapterwise metadata to standard Markdown files using YAML frontmatter. Code
 ## Script Location
 
 ```
-${CLAUDE_PLUGIN_ROOT}/skills/lite/lite_helper.py
+${CLAUDE_PLUGIN_ROOT}/scripts/lite_helper.py
 ```
 
 ## All Fields Are Optional
@@ -176,16 +176,16 @@ Key concepts to explore...
 
 ```bash
 # Validate/fix a markdown file's frontmatter
-python ${CLAUDE_PLUGIN_ROOT}/skills/lite/lite_helper.py document.md
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lite_helper.py document.md
 
 # Process all markdown files in directory
-python ${CLAUDE_PLUGIN_ROOT}/skills/lite/lite_helper.py /path/to/folder --recursive
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lite_helper.py /path/to/folder --recursive
 
 # Preview without changes
-python ${CLAUDE_PLUGIN_ROOT}/skills/lite/lite_helper.py document.md --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lite_helper.py document.md --dry-run
 
 # Add missing frontmatter to bare markdown
-python ${CLAUDE_PLUGIN_ROOT}/skills/lite/lite_helper.py document.md --init
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lite_helper.py document.md --init
 ```
 
 ## What the Helper Fixes

@@ -35,7 +35,7 @@ Place `index.codex.yaml` at the **root of your Git repository**. This is the ent
 ## Script Location
 
 ```
-${CLAUDE_PLUGIN_ROOT}/skills/index/index_generator.py
+${CLAUDE_PLUGIN_ROOT}/scripts/index_generator.py
 ```
 
 ## Minimal Index (Auto-Discovery)
@@ -165,19 +165,19 @@ children:
 
 ```bash
 # Generate index for current directory
-python ${CLAUDE_PLUGIN_ROOT}/skills/index/index_generator.py .
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/index_generator.py .
 
 # Generate for specific path
-python ${CLAUDE_PLUGIN_ROOT}/skills/index/index_generator.py /path/to/project
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/index_generator.py /path/to/project
 
 # Preview without writing
-python ${CLAUDE_PLUGIN_ROOT}/skills/index/index_generator.py . --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/index_generator.py . --dry-run
 
 # Include markdown files
-python ${CLAUDE_PLUGIN_ROOT}/skills/index/index_generator.py . --include-md
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/index_generator.py . --include-md
 
 # Verbose output
-python ${CLAUDE_PLUGIN_ROOT}/skills/index/index_generator.py . -v
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/index_generator.py . -v
 ```
 
 ## Workflow

@@ -353,7 +353,7 @@ tags:
 **After adding ANY new entity/node to a codex file, ALWAYS run the auto-fixer:**
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/format/auto_fixer.py <file.codex.yaml>
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py <file.codex.yaml>
 ```
 
 ### When to Run Auto-Fixer
@@ -389,22 +389,22 @@ Run it after:
 
 ```bash
 # Fix a single file
-python auto_fixer.py /path/to/file.codex.yaml
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py /path/to/file.codex.yaml
 
 # Fix all files in directory recursively
-python auto_fixer.py /path/to/directory --recursive
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py /path/to/directory --recursive
 
 # Dry run (preview fixes without changing files)
-python auto_fixer.py /path/to/file.codex.yaml --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py /path/to/file.codex.yaml --dry-run
 
 # Regenerate ALL IDs (useful for duplicating content)
-python auto_fixer.py /path/to/file.codex.yaml --re-id
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py /path/to/file.codex.yaml --re-id
 
 # Verbose output
-python auto_fixer.py /path/to/file.codex.yaml --verbose
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py /path/to/file.codex.yaml --verbose
 
 # Combine flags
-python auto_fixer.py /path/to/directory -r -d -v
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py /path/to/directory -r -d -v
 ```
 
 ### Quick Pattern
@@ -412,7 +412,7 @@ python auto_fixer.py /path/to/directory -r -d -v
 ```
 1. Write/edit codex content (add any new entity)
 2. Save file
-3. Run: python3 ${CLAUDE_PLUGIN_ROOT}/skills/format/auto_fixer.py <file>
+3. Run: python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py <file>
 4. Report fixes to user
 ```
 
