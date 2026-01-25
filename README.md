@@ -9,7 +9,7 @@ The Chapterwise Codex format is a perfectly recursive YAML/JSON specification fo
 ### Direct Install (Recommended)
 
 ```bash
-/plugin install --source github ansonphong/chapterwise-codex-claude-plugin
+/plugin install --source github ansonphong/chapterwise-codex-claude
 ```
 
 ### Via Marketplace (if available)
@@ -22,7 +22,7 @@ The Chapterwise Codex format is a perfectly recursive YAML/JSON specification fo
 ### Local Development
 
 ```bash
-claude --plugin-dir /path/to/chapterwise-codex-claude-plugin
+claude --plugin-dir /path/to/chapterwise-codex-claude
 ```
 
 ## Skills Included
@@ -145,4 +145,4 @@ MIT License - see [LICENSE](LICENSE) file.
 
 - [Chapterwise App](https://chapterwise.app)
 - [Codex Format Specification](https://chapterwise.app/docs/codex/format)
-- [Plugin Repository](https://github.com/ansonphong/chapterwise-codex-claude-plugin)
+- [Plugin Repository](https://github.com/ansonphong/chapterwise-codex-claude)

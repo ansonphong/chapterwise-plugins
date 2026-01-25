@@ -2,7 +2,7 @@
   "name": "chapterwise-codex",
   "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
   "version": "1.0.0",
-  "homepage": "https://github.com/ansonphong/chapterwise-codex-claude-plugin",
-  "repository": "https://github.com/ansonphong/chapterwise-codex-claude-plugin",
+  "homepage": "https://github.com/ansonphong/chapterwise-codex-claude",
+  "repository": "https://github.com/ansonphong/chapterwise-codex-claude",
   "license": "MIT"
 }
