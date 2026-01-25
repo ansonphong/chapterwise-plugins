@@ -1,5 +1,5 @@
 ---
-description: Auto-generate tags from content in codex files
+description: Auto-generate tags from content in codex or markdown files
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - generate tags
@@ -11,11 +11,15 @@ triggers:
 
 # Generate Tags
 
-Automatically extract meaningful tags from the body content of codex files using text analysis.
+Automatically extract meaningful tags from content using text analysis.
+
+**Supports both:**
+- Full Codex files (`.codex.yaml`, `.codex.json`)
+- Codex Lite / Markdown files (`.md` with YAML frontmatter)
 
 ## How It Works
 
-1. Extracts text from `body` fields in the codex
+1. Extracts text from `body` fields (Codex) or markdown body (Codex Lite)
 2. Tokenizes with support for extended Latin characters
 3. Filters out 200+ common stopwords and manuscript boilerplate
 4. Analyzes word frequency with heading boost
@@ -25,32 +29,26 @@ Automatically extract meaningful tags from the body content of codex files using
 ## Usage
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py <file.codex.yaml> [options]
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py <file> [options]
 ```
 
 ### Options
 
 ```bash
-# Basic usage (generates up to 10 tags per entity)
+# Codex files
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py story.codex.yaml
-
-# Generate more tags
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py story.codex.yaml --count 15
-
-# Require more occurrences before tagging
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py story.codex.yaml --min-count 5
-
-# Output with counts (detailed format)
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py story.codex.yaml --format detailed
-
-# Also process included files
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py story.codex.yaml --follow-includes
 
-# Preview without changes
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py story.codex.yaml --dry-run
+# Markdown (Codex Lite) files
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py chapter.md
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py chapter.md --count 5 --min-count 2
 
-# Verbose output
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py story.codex.yaml -v
+# Common options
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py <file> --min-count 5
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py <file> --format detailed
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py <file> --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/tag_generator.py <file> -v
 ```
 
 ### Parameters

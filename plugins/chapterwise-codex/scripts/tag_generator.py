@@ -1,7 +1,11 @@
 """
-Tag Generator - Extract tags from body fields in Codex files
+Tag Generator - Extract tags from body fields in Codex and Markdown files
 
 Auto-generate tags from content using text analysis.
+
+Supports:
+- Full Codex files (.codex.yaml, .codex.yml, .codex.json, .codex)
+- Codex Lite / Markdown files (.md) with YAML frontmatter
 
 Features:
 - Unicode normalization and HTML/markdown cleanup
@@ -11,10 +15,11 @@ Features:
 - Smart capitalization and redundancy avoidance
 
 Usage:
-    python tag_generator.py <file.codex.yaml> [options]
+    python tag_generator.py <file> [options]
 
 Examples:
     python tag_generator.py story.codex.yaml
+    python tag_generator.py chapter.md
     python tag_generator.py story.codex.yaml --count 15
     python tag_generator.py story.codex.yaml --min-count 5
     python tag_generator.py story.codex.yaml --dry-run
@@ -64,6 +69,11 @@ def is_codex_file(file_path: str) -> bool:
     """Check if file is a codex file."""
     lower = file_path.lower()
     return any(lower.endswith(ext) for ext in ['.codex.yaml', '.codex.yml', '.codex.json', '.codex'])
+
+
+def is_markdown_file(file_path: str) -> bool:
+    """Check if file is a markdown file."""
+    return file_path.lower().endswith('.md')
 
 
 class TagGenerator:
@@ -371,6 +381,92 @@ class TagGenerator:
             with open(file_path, 'w', encoding='utf-8') as f:
                 yaml.dump(data, f, Dumper=CodexDumper, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
 
+    def _extract_frontmatter(self, content: str) -> Tuple[Dict[str, Any], str]:
+        """Extract YAML frontmatter from markdown content."""
+        import yaml
+
+        frontmatter: Dict[str, Any] = {}
+        body = content
+
+        trimmed = content.lstrip()
+        if trimmed.startswith('---'):
+            # Find the closing delimiter
+            after_first = trimmed[3:]
+            end_index = after_first.find('\n---')
+
+            if end_index != -1:
+                fm_text = after_first[:end_index]
+                body_start = 3 + end_index + 4  # "---" + content + "\n---"
+                body = trimmed[body_start:].strip()
+
+                try:
+                    frontmatter = yaml.safe_load(fm_text) or {}
+                except yaml.YAMLError as e:
+                    logger.warning(f"Failed to parse frontmatter: {e}")
+
+        return frontmatter, body
+
+    def _serialize_markdown(self, frontmatter: Dict[str, Any], body: str) -> str:
+        """Serialize frontmatter and body back to markdown format."""
+        import yaml
+
+        if not frontmatter:
+            return body
+
+        fm_yaml = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+        return f"---\n{fm_yaml}\n---\n\n{body}"
+
+    def _generate_tags_markdown(
+        self,
+        input_path: str,
+        max_tags: int,
+        min_count: int,
+        output_format: str,
+        dry_run: bool
+    ) -> bool:
+        """
+        Generate tags for a Markdown (Codex Lite) file.
+
+        Returns True if the file was modified.
+        """
+        try:
+            with open(input_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            frontmatter, body = self._extract_frontmatter(content)
+
+            # If no frontmatter, we can't add tags properly
+            if not frontmatter:
+                self.errors.append(f"No frontmatter found in: {input_path}")
+                return False
+
+            # Generate tags from body content
+            generated_tags = self.compute_tags_from_markdown(body, max_tags, min_count)
+
+            if not generated_tags:
+                return False
+
+            # Convert to appropriate format
+            if output_format == 'simple':
+                frontmatter['tags'] = [t['name'] for t in generated_tags]
+            else:
+                frontmatter['tags'] = generated_tags
+
+            self.entities_updated += 1
+            self.total_tags_generated += len(generated_tags)
+
+            if not dry_run:
+                # Write back to file
+                new_content = self._serialize_markdown(frontmatter, body)
+                with open(input_path, 'w', encoding='utf-8') as f:
+                    f.write(new_content)
+
+            return True
+
+        except Exception as e:
+            self.errors.append(f"Failed to process markdown file '{input_path}': {e}")
+            return False
+
     def generate_tags(
         self,
         input_path: str,
@@ -381,7 +477,7 @@ class TagGenerator:
         dry_run: bool = False
     ) -> Dict[str, Any]:
         """
-        Generate tags in a codex file.
+        Generate tags in a codex or markdown file.
 
         Returns:
             Dict with keys: success, entities_updated, total_tags_generated, files_modified, errors
@@ -401,6 +497,24 @@ class TagGenerator:
 
             self.processed_files.add(input_path)
 
+            # Handle Markdown (Codex Lite) files
+            if is_markdown_file(input_path):
+                was_modified = self._generate_tags_markdown(
+                    input_path, max_tags, min_count, output_format, dry_run
+                )
+
+                if was_modified and not dry_run:
+                    self.files_modified.append(input_path)
+
+                return {
+                    'success': True,
+                    'entities_updated': self.entities_updated,
+                    'total_tags_generated': self.total_tags_generated,
+                    'files_modified': self.files_modified,
+                    'errors': self.errors
+                }
+
+            # Handle full Codex files
             with open(input_path, 'r', encoding='utf-8') as f:
                 file_content = f.read()
 
@@ -445,20 +559,27 @@ class TagGenerator:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description='Generate tags from body fields in Codex files',
+        description='Generate tags from body fields in Codex and Markdown files',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
+    # Codex files
     python tag_generator.py story.codex.yaml
     python tag_generator.py story.codex.yaml --count 15
     python tag_generator.py story.codex.yaml --min-count 5
     python tag_generator.py story.codex.yaml --format detailed
     python tag_generator.py story.codex.yaml --follow-includes
+
+    # Markdown (Codex Lite) files
+    python tag_generator.py chapter.md
+    python tag_generator.py chapter.md --count 5 --min-count 2
+
+    # Dry run (preview without changes)
     python tag_generator.py story.codex.yaml --dry-run
         """
     )
 
-    parser.add_argument('input', help='Input codex file path')
+    parser.add_argument('input', help='Input file path (.codex.yaml, .codex.json, or .md)')
     parser.add_argument('--count', type=int, default=10, help='Maximum tags per entity (default: 10)')
     parser.add_argument('--min-count', type=int, default=3, help='Minimum word occurrences (default: 3)')
     parser.add_argument('--format', choices=['simple', 'detailed'], default='simple',
