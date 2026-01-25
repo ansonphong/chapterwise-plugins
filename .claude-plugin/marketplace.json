@@ -14,8 +14,8 @@
       "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
       "version": "1.0.0",
       "source": {
-        "source": "local",
-        "path": "."
+        "type": "github",
+        "repo": "ansonphong/chapterwise-codex-claude"
       },
       "tags": ["codex", "yaml", "document-management", "storytelling"],
       "category": "productivity"
