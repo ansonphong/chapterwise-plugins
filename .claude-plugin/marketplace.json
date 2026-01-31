@@ -18,7 +18,7 @@
       "category": "productivity"
     },
     {
-      "name": "chapterwise-insert",
+      "name": "chapterwise",
       "description": "Intelligently insert notes into Chapterwise Codex manuscripts with semantic location finding",
       "version": "1.0.0",
       "source": "./plugins/chapterwise-insert",
