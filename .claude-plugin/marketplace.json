@@ -19,7 +19,7 @@
     },
     {
       "name": "chapterwise",
-      "description": "Intelligently insert notes into Chapterwise Codex manuscripts with semantic location finding",
+      "description": "Chapterwise functions for Claude Code",
       "version": "1.0.0",
       "source": "./plugins/chapterwise-insert",
       "tags": ["codex", "manuscript", "notes", "insertion", "storytelling"],

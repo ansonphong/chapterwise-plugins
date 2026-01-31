@@ -1,6 +1,6 @@
 {
   "name": "chapterwise",
-  "description": "Intelligently insert notes into Chapterwise Codex manuscripts with semantic location finding",
+  "description": "Chapterwise functions for Claude Code",
   "version": "1.0.0",
   "homepage": "https://github.com/ansonphong/chapterwise-claude-plugins",
   "repository": "https://github.com/ansonphong/chapterwise-claude-plugins",
