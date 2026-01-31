@@ -1,6 +1,14 @@
-# Chapterwise Codex - Claude Code Plugin
+# Chapterwise Claude Plugins
 
+A collection of Claude Code plugins for working with Chapterwise Codex documents.
+
+## Plugins
+
+### chapterwise-codex
 Skills for creating, validating, and managing Chapterwise Codex documents.
+
+### chapterwise-insert
+Intelligently insert notes into Chapterwise Codex manuscripts with semantic location finding. See [chapterwise-insert](#chapterwise-insert-plugin) below.
 
 The Chapterwise Codex format is a perfectly recursive YAML/JSON specification for **any structured content** - stories, characters, budgets, technical specs, scripts, or literally anything else. This plugin provides Claude Code with the skills to work with Codex files.
 
@@ -136,6 +144,72 @@ The auto-fixer ensures Codex file integrity:
 - Claude Code 1.0.33 or later
 - Python 3.8+ (for helper scripts)
 - PyYAML (`pip install pyyaml`)
+
+---
+
+## chapterwise-insert Plugin
+
+Intelligently insert notes into Chapterwise Codex manuscripts by finding the right location using semantic matching and hierarchical agent search.
+
+### The Problem
+
+You write notes in a digital notepad - scenes, ideas, bullet points. The most time-consuming part is finding where each note belongs in your manuscript, especially in large multi-chapter projects.
+
+### The Solution
+
+`/insert` uses AI to semantically match your notes to the right location in your codex files:
+
+```bash
+# Insert a note with a location hint
+/insert "after the hyperborean incursion - Elena drew her sword..." into ./manuscript/
+
+# Batch insert from a file
+/insert notes.txt into ./manuscript/
+
+# Preview without writing
+/insert --dry-run notes.txt into ./manuscript/
+```
+
+### Features
+
+- **Semantic Matching**: Finds locations from vague instructions like "after the battle" or "when Elena speaks"
+- **Hierarchical Search**: Uses parallel agents to search large manuscripts without context overflow
+- **Confidence-Based UX**: Auto-inserts at high confidence (≥95%), shows options at medium (50-95%), asks at low (<50%)
+- **Insert Markers**: Wraps inserts with HTML comments for review before accepting
+- **Dual Format Support**: Works with both Codex (YAML) and Codex Lite (Markdown)
+- **Batch Processing**: Insert multiple notes from a single file
+
+### Insert Markers
+
+Inserts are wrapped with metadata for review:
+
+```html
+<!-- INSERT
+time: 2024-01-27T10:30:00Z
+instruction: "after the hyperborean incursion"
+confidence: 0.93
+-->
+Elena drew her sword, the blade catching moonlight...
+<!-- /INSERT -->
+```
+
+Accept inserts after review:
+```bash
+/insert --accept ./manuscript/
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/insert "text" into file` | Insert single note |
+| `/insert notes.txt into folder/` | Batch insert from file |
+| `/insert --clipboard into folder/` | Insert from clipboard |
+| `/insert --accept path` | Accept pending inserts (remove markers) |
+| `/insert --undo file` | Restore from backup |
+| `/insert --dry-run ...` | Preview without writing |
+
+---
 
 ## License
 
