@@ -21,7 +21,7 @@
       "name": "chapterwise",
       "description": "Chapterwise functions for Claude Code",
       "version": "1.0.0",
-      "source": "./plugins/chapterwise-insert",
+      "source": "./plugins/chapterwise",
       "tags": ["codex", "manuscript", "notes", "insertion", "storytelling"],
       "category": "productivity"
     }
