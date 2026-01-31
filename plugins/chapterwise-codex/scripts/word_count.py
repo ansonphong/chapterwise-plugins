@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Word Count - Update word_count attributes in Codex files
 

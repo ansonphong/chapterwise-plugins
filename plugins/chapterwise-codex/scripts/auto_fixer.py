@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Auto-Fix Service for Codex V1.2 Integrity Issues
 Automatically repairs common integrity problems in codex files.

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Codex Lite Helper - Validate and fix Markdown frontmatter
 Ensures Codex Lite files have proper YAML frontmatter.

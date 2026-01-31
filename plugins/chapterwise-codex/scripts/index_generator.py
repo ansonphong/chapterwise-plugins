@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Index Generator for Chapterwise Codex Projects
 Generates index.codex.yaml files by scanning directory structure.

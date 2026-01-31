@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Convert Format - Codex <-> Markdown (Codex Lite) Conversion
 

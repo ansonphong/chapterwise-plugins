@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Tag Generator - Extract tags from body fields in Codex and Markdown files
 
