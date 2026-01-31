@@ -47,13 +47,30 @@ Priority (later overrides earlier):
 4. Command flags
 
 ```yaml
-# Example config
-historyDepth: 3          # Keep last N analysis results
-defaultModules:          # Modules to run with --all
+# ~/.claude/analyze/config.yaml (global)
+# ./.chapterwise/analysis.yaml (project)
+
+# History management
+historyDepth: 3              # Keep last N analysis results per module
+
+# Default behavior
+skipIfFresh: true            # Skip if sourceHash matches (use --force to override)
+defaultModules:              # Modules to run with /analyze --all
   - summary
   - characters
-skipIfFresh: true        # Skip analysis if sourceHash matches
+
+# Model preference (optional)
+model: claude-sonnet-4       # Model to record in analysis metadata
+
+# Custom module paths (additional to standard locations)
+customModulePaths: []        # Extra directories to search for modules
+
+# Output preferences
+verboseOutput: false         # Show full analysis in console after completion
+autoCommit: false            # Git commit analysis files automatically
 ```
+
+**Note:** No per-module overrides in v1.0 - global settings only for simplicity.
 
 ---
 
@@ -80,6 +97,77 @@ skipIfFresh: true        # Skip analysis if sourceHash matches
 /analyze summary --history-depth 5    # Override history retention
 /analyze summary --dry-run            # Preview what would run
 ```
+
+---
+
+## Interactive Picker Flow (Category-First)
+
+When `/analyze` is called with no arguments, use AskUserQuestion with category-first approach (scales to 30+ modules):
+
+```
+Step 1: "Which category of analysis?"
+  ○ Narrative Structure (summary, story-beats)
+  ○ Characters (characters)
+  ○ Quality Assessment (plot-holes, critical-review)
+  ○ All modules
+
+Step 2 (if not "All"): "Which module(s)?" [multiSelect: true]
+  ○ summary - Chapter summaries
+  ○ story-beats - Key narrative moments
+
+Step 3: "Which file to analyze?"
+  [If .codex.yaml files found in cwd, show up to 4]
+  ○ chapter-1.codex.yaml
+  ○ chapter-2.codex.yaml
+  ○ manuscript.codex.yaml
+  ○ Other (specify path)
+```
+
+---
+
+## File Auto-Detection
+
+When user runs `/analyze summary` without a file path:
+
+1. Look for `.codex.yaml` files in current directory
+2. If exactly 1 found → use it automatically
+3. If 2-4 found → show picker via AskUserQuestion
+4. If >4 found → show first 3 + "Other (specify path)"
+5. If 0 found → show helpful error:
+
+```
+No .codex.yaml files found in current directory.
+
+Try:
+  /analyze summary path/to/file.codex.yaml
+  /analyze summary --glob "**/*.codex.yaml"
+```
+
+---
+
+## Node Extraction (`--node`)
+
+When user runs `/analyze summary --node chapter-3 book.codex.yaml`:
+
+1. Read the full `.codex.yaml` file
+2. Search recursively for node with matching ID or name:
+   - Priority 1: Exact `id` match (UUID or slug)
+   - Priority 2: Exact `name` match (case-insensitive)
+   - Priority 3: Partial `name` match (contains)
+3. Extract that node + its children as content to analyze
+4. Record target node in output:
+
+```yaml
+# In .analysis.codex.yaml
+children:
+  - name: summary
+    targetNode: "chapter-3"
+    targetNodeName: "Chapter 3: The Beginning"
+    history:
+      - ...
+```
+
+5. If no match found: Error with list of available node IDs/names
 
 ---
 
@@ -132,8 +220,8 @@ children:
 
 ```json
 {
-  "name": "analyze",
-  "description": "Run literary analysis on Codex files with AI-powered modules",
+  "name": "chapterwise-analysis",
+  "description": "AI-powered literary analysis for Codex files (ChapterWise Analysis)",
   "version": "1.0.0",
   "homepage": "https://github.com/ansonphong/chapterwise-claude-plugins",
   "repository": "https://github.com/ansonphong/chapterwise-claude-plugins",
@@ -141,24 +229,34 @@ children:
 }
 ```
 
-**Step 2: Create stub analyze.md command**
+**Step 2: Create stub analysis.md command**
 
 ```markdown
 ---
-description: Run AI analysis on Codex files
+description: Run AI analysis on Codex files (ChapterWise Analysis)
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task
 triggers:
-  - analyze
-  - analyze summary
-  - analyze characters
-  - analyze plot-holes
-  - analyze story-beats
-  - analyze critical-review
-  - analyze list
-  - analyze help
+  # Primary (branded - discoverable via /chapterwise)
+  - chapterwise:analysis
+  - chapterwise:analysis summary
+  - chapterwise:analysis characters
+  - chapterwise:analysis plot-holes
+  - chapterwise:analysis story-beats
+  - chapterwise:analysis critical-review
+  - chapterwise:analysis list
+  - chapterwise:analysis help
+  # Shortcuts (power users)
+  - analysis
+  - analysis summary
+  - analysis characters
+  - analysis plot-holes
+  - analysis story-beats
+  - analysis critical-review
+  - analysis list
+  - analysis help
 ---
 
-# Analyze Command (Stub)
+# ChapterWise Analysis Command (Stub)
 
 This command will be implemented in subsequent tasks.
 ```
@@ -1084,39 +1182,55 @@ git commit -m "feat(analyze): add critical-review analysis module"
 
 ---
 
-### Task 11: Main Analyze Command
+### Task 11: Main Analysis Command
 
 **Files:**
-- Modify: `plugins/chapterwise-analysis/commands/analyze.md`
+- Modify: `plugins/chapterwise-analysis/commands/analysis.md`
 
-**Step 1: Write the full analyze.md command**
+**Step 1: Write the full analysis.md command**
 
 ```markdown
 ---
-description: Run AI analysis on Codex files
+description: Run AI analysis on Codex files (ChapterWise Analysis)
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task
 triggers:
-  - analyze
-  - analyze summary
-  - analyze characters
-  - analyze plot-holes
-  - analyze story-beats
-  - analyze critical-review
-  - analyze list
-  - analyze help
+  # Primary (branded - discoverable via /chapterwise)
+  - chapterwise:analysis
+  - chapterwise:analysis summary
+  - chapterwise:analysis characters
+  - chapterwise:analysis plot-holes
+  - chapterwise:analysis story-beats
+  - chapterwise:analysis critical-review
+  - chapterwise:analysis list
+  - chapterwise:analysis help
+  # Shortcuts (power users)
+  - analysis
+  - analysis summary
+  - analysis characters
+  - analysis plot-holes
+  - analysis story-beats
+  - analysis critical-review
+  - analysis list
+  - analysis help
 ---
 
-# Analyze Command
+# ChapterWise Analysis Command
 
 Run AI-powered literary analysis on Codex files. Results are saved to sibling `.analysis.codex.yaml` files.
 
 ## Usage
 
 ```bash
-/analyze                              # Interactive module picker
-/analyze <module> [file]              # Direct analysis
-/analyze list                         # Show available modules
-/analyze help <module>                # Module details
+# Branded (discoverable - type /chapterwise to see all)
+/chapterwise:analysis                 # Interactive module picker
+/chapterwise:analysis summary         # Direct analysis
+/chapterwise:analysis list            # Show available modules
+
+# Shortcuts (power users)
+/analysis                             # Interactive module picker
+/analysis <module> [file]             # Direct analysis
+/analysis list                        # Show available modules
+/analysis help <module>               # Module details
 ```
 
 ## Command Routing
@@ -1264,25 +1378,248 @@ git commit -m "feat(analyze): implement main analyze command"
 
 ---
 
-### Task 12: Rename chapterwise-codex to codex
+### Task 12: Subagent Orchestration
 
 **Files:**
-- Modify: `plugins/chapterwise-codex/.claude-plugin/plugin.json`
+- Modify: `plugins/chapterwise-analysis/commands/analyze.md`
 
-**Step 1: Update plugin.json name**
+**Purpose:** Leverage Claude Code's Task system for parallel processing of batch analysis.
 
-Change `"name": "chapterwise-codex"` to `"name": "codex"`
+**Step 1: Add subagent orchestration logic to analyze.md**
+
+Add this section to the command:
+
+```markdown
+## Subagent Orchestration
+
+Use Claude Code's Task tool for parallel execution when processing multiple targets.
+
+### When to spawn subagents:
+
+| Scenario | Execution |
+|----------|-----------|
+| Single file, single module | Inline (current conversation) |
+| Single file, multiple modules | Spawn 1 Task per module (parallel) |
+| Multiple files (`--all`, `--glob`) | Spawn 1 Task per file (parallel) |
+| Large file with many nodes | Spawn 1 Task per node (parallel) |
+
+### Task structure for batch analysis:
+
+When `/analyze summary characters --all` is invoked:
+
+1. Find all `.codex.yaml` files
+2. Check staleness for each
+3. For each stale file, spawn a Task:
+
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  description: "Analyze chapter-1.codex.yaml",
+  prompt: `
+    You are running analysis for the chapterwise-analysis plugin.
+
+    1. Read file: ${filePath}
+    2. Run these modules: ${modules.join(', ')}
+    3. For each module:
+       - Load prompt from: ${CLAUDE_PLUGIN_ROOT}/modules/${module}.md
+       - Analyze the content
+       - Save via: python3 ${CLAUDE_PLUGIN_ROOT}/scripts/analysis_writer.py
+    4. Report completion status
+  `
+})
+```
+
+4. Wait for all Tasks to complete
+5. Aggregate results and report summary
+
+### Parallel execution example:
+
+```
+/analyze summary characters plot-holes --all
+
+Main thread:
+├─ Find 5 .codex.yaml files
+├─ Spawn 5 Tasks in parallel:
+│   ├─ Task 1: "Analyze chapter-1.codex.yaml with 3 modules"
+│   ├─ Task 2: "Analyze chapter-2.codex.yaml with 3 modules"
+│   ├─ Task 3: "Analyze chapter-3.codex.yaml with 3 modules"
+│   ├─ Task 4: "Analyze chapter-4.codex.yaml with 3 modules"
+│   └─ Task 5: "Analyze chapter-5.codex.yaml with 3 modules"
+├─ Collect results
+└─ Report: "Analyzed 5 files with 3 modules each (15 total)"
+```
+```
 
 **Step 2: Commit**
 
 ```bash
-git add plugins/chapterwise-codex/.claude-plugin/plugin.json
-git commit -m "refactor(codex): rename plugin from chapterwise-codex to codex"
+git add plugins/chapterwise-analysis/commands/analyze.md
+git commit -m "feat(analyze): add subagent orchestration for batch processing"
 ```
 
 ---
 
-### Task 13: End-to-End Test
+### Task 13: Custom Module Template
+
+**Files:**
+- Create: `plugins/chapterwise-analysis/modules/_template.md`
+
+**Step 1: Create template file**
+
+```markdown
+---
+name: my-analysis              # Required: unique identifier (kebab-case)
+displayName: My Custom Analysis # Required: shown in picker
+description: Brief description of what this module analyzes
+category: Custom               # Groups in picker (use existing or create new)
+icon: ph ph-lightbulb          # Phosphor icon class (see phosphoricons.com)
+applicableTypes: []            # Empty = all types, or [novel, screenplay, etc.]
+---
+
+# [Module Name] Analysis
+
+You are an expert analyst specializing in [your domain].
+
+## Your Task
+
+Analyze the provided content for:
+1. [First thing to analyze]
+2. [Second thing to analyze]
+3. [Third thing to analyze]
+
+## Output Format
+
+Return your analysis as a JSON object with this structure:
+
+```json
+{
+  "body": "## [Module Name]\n\n[Main analysis in markdown - be detailed and specific]",
+  "summary": "[One-line summary of your findings]",
+  "children": [
+    {
+      "name": "[Section Name]",
+      "summary": "[Section summary]",
+      "content": "## [Section]\n\n[Detailed analysis for this section]",
+      "attributes": [
+        {"key": "score", "name": "Score", "value": 7, "dataType": "int"}
+      ]
+    }
+  ],
+  "tags": ["my-analysis", "relevant-tag"],
+  "attributes": [
+    {"key": "overall_score", "name": "Overall Score", "value": 7, "dataType": "int"}
+  ]
+}
+```
+
+## Guidelines
+
+- Analyze the ACTUAL text provided - never use placeholder values
+- Be specific - reference the source content directly
+- Use markdown formatting in body/content fields
+- Score attributes 1-10 based on your analysis
+- Include 2-5 children sections for detailed breakdowns
+```
+
+**Step 2: Commit**
+
+```bash
+git add plugins/chapterwise-analysis/modules/_template.md
+git commit -m "docs(analyze): add custom module template for user extensions"
+```
+
+---
+
+### Task 14: Update Marketplace.json
+
+**Files:**
+- Modify: `.claude-plugin/marketplace.json`
+
+**Step 1: Add chapterwise-analysis plugin entry**
+
+```json
+{
+  "name": "chapterwise-plugins",
+  "owner": {
+    "name": "Anson Phong",
+    "email": "phong@phong.com"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "description": "ChapterWise plugins for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "codex",
+      "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
+      "version": "1.0.0",
+      "source": "./plugins/chapterwise-codex",
+      "tags": ["codex", "yaml", "document-management", "storytelling"],
+      "category": "productivity"
+    },
+    {
+      "name": "chapterwise",
+      "description": "Chapterwise functions for Claude Code",
+      "version": "1.0.0",
+      "source": "./plugins/chapterwise",
+      "tags": ["codex", "manuscript", "notes", "insertion", "storytelling"],
+      "category": "productivity"
+    },
+    {
+      "name": "analyze",
+      "description": "AI-powered literary analysis for Codex files",
+      "version": "1.0.0",
+      "source": "./plugins/chapterwise-analysis",
+      "tags": ["analysis", "writing", "feedback", "storytelling", "ai"],
+      "category": "productivity"
+    }
+  ]
+}
+```
+
+**Step 2: Commit**
+
+```bash
+git add .claude-plugin/marketplace.json
+git commit -m "feat: add chapterwise-analysis to marketplace, rename codex"
+```
+
+---
+
+### Task 15: Update Plugin Namespaces
+
+**Files:**
+- Modify: `plugins/chapterwise-codex/.claude-plugin/plugin.json`
+- Verify: All command triggers use short namespace
+
+**Step 1: Rename chapterwise-codex to codex**
+
+Update `plugins/chapterwise-codex/.claude-plugin/plugin.json`:
+```json
+{
+  "name": "codex",
+  ...
+}
+```
+
+**Step 2: Verify all commands use `/codex` namespace**
+
+Check all command files in `plugins/chapterwise-codex/commands/` have triggers like:
+- `codex format` (not `chapterwise-codex format`)
+- `codex explode`
+- `codex implode`
+- etc.
+
+**Step 3: Commit**
+
+```bash
+git add plugins/chapterwise-codex/
+git commit -m "refactor(codex): use short /codex namespace"
+```
+
+---
+
+### Task 16: End-to-End Test
 
 **Files:** None (testing only)
 
@@ -1320,7 +1657,14 @@ claude /analyze summary /path/to/sample.codex.yaml
 ```
 Expected: Shows existing analysis, asks if re-run wanted
 
-**Step 5: Final commit**
+**Step 5: Test batch with subagents**
+
+```bash
+claude /analyze summary --all
+```
+Expected: Spawns parallel Tasks for each file
+
+**Step 6: Final commit**
 
 ```bash
 git add -A
@@ -1335,18 +1679,56 @@ git commit -m "test(analyze): verify end-to-end analysis flow"
 - [ ] `python3 scripts/staleness_checker.py <file>` returns valid JSON
 - [ ] `/analyze list` displays formatted module list
 - [ ] `/analyze summary <file>` creates `.analysis.codex.yaml`
+- [ ] `/analyze` (no args) shows category picker
+- [ ] `/analyze summary` (no file) auto-detects .codex.yaml files
+- [ ] `--node chapter-3` extracts and analyzes specific node
 - [ ] Second run detects fresh analysis and prompts
 - [ ] `--force` flag bypasses freshness check
-- [ ] History limited to configured depth
+- [ ] History limited to configured depth (default 3)
+- [ ] Custom modules in `~/.claude/analyze/modules/` are discovered
 - [ ] Custom modules in `.chapterwise/analysis-modules/` are discovered
+- [ ] `/analyze summary --all` spawns parallel subagents
+- [ ] marketplace.json lists all 3 plugins with correct namespaces
+- [ ] `/codex format` works (short namespace)
+- [ ] `/analyze summary` works (short namespace)
+
+---
+
+## Plugin Namespaces (Final)
+
+**Primary namespace:** `/chapterwise:*` for all tools (branded, discoverable)
+**Shortcuts:** Short aliases for power users
+
+| Plugin | Primary (Branded) | Shortcut | Examples |
+|--------|-------------------|----------|----------|
+| chapterwise-analysis | `/chapterwise:analysis` | `/analysis` | `/chapterwise:analysis summary`, `/analysis summary` |
+| chapterwise-codex | `/chapterwise:codex` | `/codex` | `/chapterwise:codex format`, `/codex format` |
+| chapterwise | `/chapterwise` | - | `/chapterwise:insert` |
+
+**Discoverability:** Type `/chapterwise` to see all ChapterWise tools:
+```
+/chapterwise:analysis
+/chapterwise:codex
+/chapterwise:insert
+/chapterwise:notes
+```
+
+**Trigger configuration** (in each command's frontmatter):
+```yaml
+triggers:
+  - chapterwise:analysis           # Primary (branded)
+  - chapterwise:analysis summary   # With module
+  - analysis                       # Shortcut
+  - analysis summary               # Shortcut with module
+```
 
 ---
 
 ## Future Enhancements (Post v1.0)
 
-- Add remaining 25+ analysis modules
-- Implement `--all` and `--glob` batch processing with parallel agents
-- Add project/global config file support
+- Add remaining 25+ analysis modules from ChapterWise app
 - Add `--background` flag for async batch processing
 - Add `--json` flag to output results to stdout
+- Per-module config overrides
 - Consider `gum`/`fzf` integration for richer TUI
+- GitHub Action for CI/CD analysis in PRs
