@@ -16,6 +16,14 @@
       "source": "./plugins/chapterwise-codex",
       "tags": ["codex", "yaml", "document-management", "storytelling"],
       "category": "productivity"
+    },
+    {
+      "name": "chapterwise-insert",
+      "description": "Intelligently insert notes into Chapterwise Codex manuscripts with semantic location finding",
+      "version": "1.0.0",
+      "source": "./plugins/chapterwise-insert",
+      "tags": ["codex", "manuscript", "notes", "insertion", "storytelling"],
+      "category": "productivity"
     }
   ]
 }
