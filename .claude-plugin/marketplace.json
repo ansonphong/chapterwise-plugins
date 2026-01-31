@@ -24,6 +24,14 @@
       "source": "./plugins/chapterwise",
       "tags": ["codex", "manuscript", "notes", "insertion", "storytelling"],
       "category": "productivity"
+    },
+    {
+      "name": "chapterwise-analysis",
+      "description": "AI-powered literary analysis for Codex files",
+      "version": "1.0.0",
+      "source": "./plugins/chapterwise-analysis",
+      "tags": ["analysis", "writing", "feedback", "storytelling", "ai"],
+      "category": "productivity"
     }
   ]
 }
