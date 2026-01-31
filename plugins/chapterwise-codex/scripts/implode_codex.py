@@ -51,30 +51,19 @@ if __name__ == '__main__':
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
 
-# Import YAML dumper for consistent formatting
-try:
-    import importlib.util
-    file_manager_path = Path(__file__).parent / 'file_manager.py'
-    if file_manager_path.exists():
-        spec_fm = importlib.util.spec_from_file_location("file_manager", file_manager_path)
-        file_manager_module = importlib.util.module_from_spec(spec_fm)
-        spec_fm.loader.exec_module(file_manager_module)
-        get_yaml_dumper_with_pipe_format = file_manager_module.get_yaml_dumper_with_pipe_format
-    else:
-        raise ImportError("file_manager.py not found")
-except Exception:
-    # Fallback YAML dumper
-    def get_yaml_dumper_with_pipe_format():
-        class CustomDumper(yaml.SafeDumper):
-            pass
+# YAML dumper for consistent formatting (pipe syntax for long strings)
+def get_yaml_dumper_with_pipe_format():
+    """Create a custom YAML dumper that uses pipe syntax for long strings."""
+    class CustomDumper(yaml.SafeDumper):
+        pass
 
-        def str_representer(dumper, data):
-            if isinstance(data, str) and (len(data) > 80 or '\n' in data):
-                return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
-            return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+    def str_representer(dumper, data):
+        if isinstance(data, str) and (len(data) > 80 or '\n' in data):
+            return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+        return dumper.represent_scalar('tag:yaml.org,2002:str', data)
 
-        CustomDumper.add_representer(str, str_representer)
-        return CustomDumper
+    CustomDumper.add_representer(str, str_representer)
+    return CustomDumper
 
 logger = logging.getLogger(__name__)
 
