@@ -125,7 +125,7 @@ class CodexAutoFixer:
 
         V1.0 Format Requirements:
         - Must have 'metadata' object at root
-        - metadata.formatVersion must be "1.0"
+        - metadata.formatVersion must be "1.2"
         - metadata.documentVersion recommended (defaults to "1.0.0")
 
         Args:
@@ -1002,10 +1002,10 @@ class CodexAutoFixer:
         import json
 
         try:
-            # Create a minimal valid V1.0 codex structure
+            # Create a minimal valid V1.2 codex structure
             recovered_data = {
                 "metadata": {
-                    "formatVersion": "1.0",
+                    "formatVersion": "1.2",
                     "documentVersion": "1.0.0"
                 },
                 "id": self._generate_new_uuid(),
@@ -1014,7 +1014,7 @@ class CodexAutoFixer:
                 "attributes": []
             }
 
-            self.fixes_applied.append("Created minimal valid V1.0 codex structure from corrupted file")
+            self.fixes_applied.append("Created minimal valid V1.2 codex structure from corrupted file")
             return recovered_data
 
         except Exception:
@@ -1075,10 +1075,10 @@ class CodexAutoFixer:
         Aggressive YAML recovery for severely malformed files.
         """
         try:
-            # Create a minimal valid V1.0 codex structure
+            # Create a minimal valid V1.2 codex structure
             recovered_data = {
                 "metadata": {
-                    "formatVersion": "1.0",
+                    "formatVersion": "1.2",
                     "documentVersion": "1.0.0"
                 },
                 "id": self._generate_new_uuid(),
@@ -1087,7 +1087,7 @@ class CodexAutoFixer:
                 "attributes": []
             }
 
-            self.fixes_applied.append("Created minimal valid V1.0 codex structure from corrupted YAML file")
+            self.fixes_applied.append("Created minimal valid V1.2 codex structure from corrupted YAML file")
             return recovered_data
 
         except Exception:
