@@ -1,0 +1,8 @@
+{
+  "name": "chapterwise-analysis",
+  "description": "AI-powered literary analysis for Codex files (ChapterWise Analysis)",
+  "version": "1.0.0",
+  "homepage": "https://github.com/ansonphong/chapterwise-claude-plugins",
+  "repository": "https://github.com/ansonphong/chapterwise-claude-plugins",
+  "license": "MIT"
+}
