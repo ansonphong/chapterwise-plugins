@@ -41,14 +41,12 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 from collections import defaultdict
 
-# Setup path for plugin execution - import from format skill
+# Setup path for plugin execution - import auto_fixer from same directory
 script_dir = Path(__file__).resolve().parent
-plugin_root = script_dir.parent.parent
-format_skill_dir = plugin_root / "skills" / "format"
 
-# Add format skill directory to path for auto_fixer import
-if str(format_skill_dir) not in sys.path:
-    sys.path.insert(0, str(format_skill_dir))
+# Add scripts directory to path for auto_fixer import
+if str(script_dir) not in sys.path:
+    sys.path.insert(0, str(script_dir))
 
 # Import auto-fixer for post-processing
 try:
@@ -56,7 +54,7 @@ try:
 except ImportError:
     # Fallback: try importing via importlib
     import importlib.util
-    auto_fixer_path = format_skill_dir / 'auto_fixer.py'
+    auto_fixer_path = script_dir / 'auto_fixer.py'
     if auto_fixer_path.exists():
         spec = importlib.util.spec_from_file_location("auto_fixer", auto_fixer_path)
         auto_fixer_module = importlib.util.module_from_spec(spec)
