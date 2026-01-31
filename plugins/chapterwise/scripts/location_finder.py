@@ -4,15 +4,21 @@ Location Finder for Chapterwise Insert
 Scans directories for codex files, indexes them, and extracts location hints.
 The actual semantic matching is done by Claude agents - this script provides helper functions.
 
+Supports include directives: When a codex file contains `include: "./path/to/file.codex.yaml"`
+in its children, this module follows those references to build a complete hierarchy.
+
 Usage:
     python location_finder.py scan <directory> [--recursive] [--no-recursive]
-    python location_finder.py index <file>
+    python location_finder.py index <file> [--no-follow-includes]
+    python location_finder.py deep <path> [--files-only]
     python location_finder.py hints "instruction text"
 
 Examples:
     python location_finder.py scan . --no-recursive
     python location_finder.py scan /path/to/project
     python location_finder.py index chapter1.codex.yaml
+    python location_finder.py index story.codex.yaml --no-follow-includes
+    python location_finder.py deep ./manuscript/  # Follow all includes
     python location_finder.py hints "after the hyperborean incursion in chapter 5"
 """
 
@@ -58,6 +64,7 @@ class FileIndex:
     body_preview: str = ""
     child_names: List[str] = field(default_factory=list)
     word_count: int = 0
+    included_files: List[str] = field(default_factory=list)  # Files referenced via include directives
 
 
 @dataclass
@@ -172,12 +179,17 @@ class LocationFinder:
         except Exception:
             return False
 
-    def index_file(self, file_path: str) -> Optional[FileIndex]:
+    def index_file(
+        self,
+        file_path: str,
+        follow_includes: bool = True
+    ) -> Optional[FileIndex]:
         """
         Create a FileIndex from a codex file.
 
         Args:
             file_path: Path to the file to index
+            follow_includes: Whether to follow include directives in YAML codex files
 
         Returns:
             FileIndex object or None if file cannot be indexed
@@ -191,17 +203,42 @@ class LocationFinder:
         name_lower = path.name.lower()
 
         if name_lower.endswith('.codex.yaml') or name_lower.endswith('.codex.yml'):
-            return self._index_codex_yaml(path)
+            return self._index_codex_yaml(path, follow_includes=follow_includes)
         elif name_lower.endswith('.md'):
             return self._index_codex_lite(path)
         else:
             self.logger.warning(f"Unsupported file type: {file_path}")
             return None
 
-    def _index_codex_yaml(self, path: Path) -> Optional[FileIndex]:
-        """Extract index information from a YAML codex file."""
+    def _index_codex_yaml(
+        self,
+        path: Path,
+        follow_includes: bool = True,
+        visited: Optional[set] = None
+    ) -> Optional[FileIndex]:
+        """
+        Extract index information from a YAML codex file.
+
+        Args:
+            path: Path to the codex file
+            follow_includes: Whether to follow include directives
+            visited: Set of already-visited paths (for cycle detection)
+
+        Returns:
+            FileIndex with child names from both inline children and included files
+        """
         try:
             import yaml
+
+            # Cycle detection
+            if visited is None:
+                visited = set()
+
+            resolved_path = str(path.resolve())
+            if resolved_path in visited:
+                self.logger.debug(f"Skipping already-visited file: {path}")
+                return None
+            visited.add(resolved_path)
 
             with open(path, 'r', encoding='utf-8') as f:
                 data = yaml.safe_load(f)
@@ -218,15 +255,41 @@ class LocationFinder:
             # Get body preview (first 500 chars)
             body_preview = body[:500] if body else ''
 
-            # Get child names
+            # Get child names and resolve includes
             children = data.get('children', [])
             child_names = []
+            included_files = []
+
             if isinstance(children, list):
                 for child in children:
                     if isinstance(child, dict):
-                        child_name = child.get('name') or child.get('title', '')
-                        if child_name:
-                            child_names.append(child_name)
+                        # Check for include directive
+                        include_path = child.get('include')
+                        if include_path and follow_includes:
+                            # Resolve relative path
+                            included_file = self._resolve_include_path(path, include_path)
+                            if included_file:
+                                included_files.append(str(included_file))
+                                # Recursively index the included file
+                                included_index = self._index_codex_yaml(
+                                    included_file,
+                                    follow_includes=True,
+                                    visited=visited
+                                )
+                                if included_index:
+                                    # Add the included file's name/title to our children
+                                    inc_name = included_index.name or included_index.title
+                                    if inc_name:
+                                        child_names.append(inc_name)
+                                    # Also inherit its children names for deeper hierarchy
+                                    child_names.extend(included_index.child_names)
+                                    # Track nested includes
+                                    included_files.extend(included_index.included_files)
+                        else:
+                            # Inline child
+                            child_name = child.get('name') or child.get('title', '')
+                            if child_name:
+                                child_names.append(child_name)
 
             # Calculate word count
             word_count = len(body.split()) if body else 0
@@ -239,11 +302,43 @@ class LocationFinder:
                 summary=summary,
                 body_preview=body_preview,
                 child_names=child_names,
-                word_count=word_count
+                word_count=word_count,
+                included_files=included_files
             )
 
         except Exception as e:
             self.logger.warning(f"Failed to index {path}: {e}")
+            return None
+
+    def _resolve_include_path(self, parent_path: Path, include_path: str) -> Optional[Path]:
+        """
+        Resolve an include directive path relative to the parent file.
+
+        Args:
+            parent_path: Path to the file containing the include directive
+            include_path: The include path (may be relative or absolute)
+
+        Returns:
+            Resolved Path or None if file doesn't exist
+        """
+        try:
+            # Handle relative paths
+            if include_path.startswith('./') or include_path.startswith('../'):
+                resolved = (parent_path.parent / include_path).resolve()
+            elif include_path.startswith('/'):
+                resolved = Path(include_path)
+            else:
+                # Assume relative to parent
+                resolved = (parent_path.parent / include_path).resolve()
+
+            if resolved.exists():
+                return resolved
+            else:
+                self.logger.debug(f"Include file not found: {include_path} -> {resolved}")
+                return None
+
+        except Exception as e:
+            self.logger.debug(f"Failed to resolve include path {include_path}: {e}")
             return None
 
     def _index_codex_lite(self, path: Path) -> Optional[FileIndex]:
@@ -307,6 +402,62 @@ class LocationFinder:
             self.logger.warning(f"Failed to index {path}: {e}")
             return None
 
+    def deep_scan_with_includes(
+        self,
+        entry_point: str,
+        follow_includes: bool = True
+    ) -> Tuple[List[FileIndex], List[str]]:
+        """
+        Perform a deep scan starting from an entry point, following all include directives.
+
+        This is useful for manuscripts that use exploded file structure with includes.
+        Returns both the indices and a flat list of all file paths in the hierarchy.
+
+        Args:
+            entry_point: Path to the root codex file or directory
+            follow_includes: Whether to follow include directives
+
+        Returns:
+            Tuple of (list of FileIndex objects, list of all file paths)
+        """
+        entry = Path(entry_point)
+        indices = []
+        all_files = []
+        visited = set()
+
+        if entry.is_dir():
+            # Scan directory first
+            files = self.scan_directory(str(entry), recursive=True)
+            for f in files:
+                if f not in visited:
+                    visited.add(f)
+                    index = self.index_file(f, follow_includes=follow_includes)
+                    if index:
+                        indices.append(index)
+                        all_files.append(f)
+                        # Add included files to our list
+                        for inc_file in index.included_files:
+                            if inc_file not in visited:
+                                all_files.append(inc_file)
+                                visited.add(inc_file)
+        else:
+            # Single file - index it and follow includes
+            index = self.index_file(str(entry), follow_includes=follow_includes)
+            if index:
+                indices.append(index)
+                all_files.append(str(entry))
+                # Include referenced files
+                for inc_file in index.included_files:
+                    if inc_file not in visited:
+                        all_files.append(inc_file)
+                        visited.add(inc_file)
+                        # Index the included file too
+                        inc_index = self.index_file(inc_file, follow_includes=follow_includes)
+                        if inc_index:
+                            indices.append(inc_index)
+
+        return indices, all_files
+
     def chunk_files(
         self,
         files: List[str],
@@ -330,7 +481,8 @@ class LocationFinder:
     def format_index_for_search(
         self,
         indices: List[FileIndex],
-        include_preview: bool = True
+        include_preview: bool = True,
+        include_includes: bool = True
     ) -> str:
         """
         Format file indices for Claude agent search prompts.
@@ -338,6 +490,7 @@ class LocationFinder:
         Args:
             indices: List of FileIndex objects
             include_preview: Whether to include body preview
+            include_includes: Whether to include list of included files
 
         Returns:
             Formatted string for agent prompt
@@ -356,6 +509,13 @@ class LocationFinder:
                 lines.append(f"Children: {', '.join(fi.child_names)}")
 
             lines.append(f"Words: {fi.word_count}")
+
+            if include_includes and fi.included_files:
+                lines.append(f"Includes: {len(fi.included_files)} file(s)")
+                for inc in fi.included_files[:5]:  # Limit to first 5
+                    lines.append(f"  - {Path(inc).name}")
+                if len(fi.included_files) > 5:
+                    lines.append(f"  ... and {len(fi.included_files) - 5} more")
 
             if include_preview and fi.body_preview:
                 preview = fi.body_preview.replace('\n', ' ')[:200]
@@ -498,11 +658,22 @@ Examples:
     index_parser.add_argument('--json', action='store_true', help='Output as JSON')
     index_parser.add_argument('--no-preview', action='store_true',
                              help='Exclude body preview')
+    index_parser.add_argument('--follow-includes', action='store_true', default=True,
+                             help='Follow include directives (default: true)')
+    index_parser.add_argument('--no-follow-includes', action='store_true',
+                             help='Do not follow include directives')
 
     # Hints command
     hints_parser = subparsers.add_parser('hints', help='Extract location hints from instruction')
     hints_parser.add_argument('instruction', help='Instruction text to parse')
     hints_parser.add_argument('--json', action='store_true', help='Output as JSON')
+
+    # Deep scan command
+    deep_parser = subparsers.add_parser('deep', help='Deep scan following include directives')
+    deep_parser.add_argument('path', help='File or directory to scan')
+    deep_parser.add_argument('--json', action='store_true', help='Output as JSON')
+    deep_parser.add_argument('--files-only', action='store_true',
+                            help='Only output file paths, not full indices')
 
     # Global options
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose output')
@@ -538,7 +709,8 @@ Examples:
                 print(f"  {f}")
 
     elif args.command == 'index':
-        index = finder.index_file(args.file)
+        follow_includes = not getattr(args, 'no_follow_includes', False)
+        index = finder.index_file(args.file, follow_includes=follow_includes)
 
         if index is None:
             print(f"Error: Could not index file: {args.file}", file=sys.stderr)
@@ -552,6 +724,11 @@ Examples:
                 include_preview=not args.no_preview
             )
             print(formatted)
+            # Also show included files if any
+            if index.included_files:
+                print(f"Included files ({len(index.included_files)}):")
+                for inc_file in index.included_files:
+                    print(f"  {inc_file}")
 
     elif args.command == 'hints':
         hints = finder.extract_location_hints(args.instruction)
@@ -573,6 +750,37 @@ Examples:
                 print(f"  Keywords: {', '.join(hints.keywords)}")
             if hints.character_refs:
                 print(f"  Characters: {', '.join(hints.character_refs)}")
+
+    elif args.command == 'deep':
+        try:
+            indices, all_files = finder.deep_scan_with_includes(args.path)
+        except Exception as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        if args.json:
+            if args.files_only:
+                print(json.dumps({'files': all_files, 'count': len(all_files)}, indent=2))
+            else:
+                output = {
+                    'indices': [asdict(idx) for idx in indices],
+                    'all_files': all_files,
+                    'file_count': len(all_files),
+                    'index_count': len(indices)
+                }
+                print(json.dumps(output, indent=2))
+        else:
+            if args.files_only:
+                print(f"Deep scan found {len(all_files)} file(s):\n")
+                for f in all_files:
+                    print(f"  {f}")
+            else:
+                print(f"Deep scan found {len(indices)} indexed file(s), {len(all_files)} total files:\n")
+                formatted = finder.format_index_for_search(indices, include_preview=True)
+                print(formatted)
+                print("\nAll files in hierarchy:")
+                for f in all_files:
+                    print(f"  {f}")
 
 
 if __name__ == '__main__':
