@@ -23,14 +23,17 @@ Import a Scrivener (.scriv) project into Chapterwise Codex format.
 # Preview what will be created (always do this first)
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scrivener_import.py /path/to/Project.scriv --dry-run
 
-# Import to Markdown (Codex Lite) - recommended
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scrivener_import.py /path/to/Project.scriv --format markdown
+# Import to Markdown (Codex Lite) with nested indexes - recommended
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scrivener_import.py /path/to/Project.scriv --format markdown --index-depth 1
 
 # Import to specific output directory
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scrivener_import.py /path/to/Project.scriv --output ./imported
 
 # Import with verbose progress
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scrivener_import.py /path/to/Project.scriv --verbose
+
+# Import with flat structure (legacy V1 mode)
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scrivener_import.py /path/to/Project.scriv --flat
 ```
 
 ## Workflow
@@ -65,6 +68,7 @@ Show the user:
 Use AskUserQuestion to confirm:
 - **Output format**: Markdown (recommended), YAML, or JSON
 - **Output location**: Current directory or custom path
+- **Index structure**: Per book (recommended), Single index, or Per act
 - **Generate index files**: Yes (recommended) or No
 
 ### Step 4: Run Import
@@ -103,6 +107,18 @@ Options:
   --verbose, -v           Verbose output
   --json                  JSON progress output (for programmatic use)
   --quiet, -q             Minimal output (errors only)
+
+V2 Nested Index Options:
+  --index-depth           How many levels get their own index.codex.yaml
+                          0 = single index at root
+                          1 = index per book/major section (default)
+                          2 = index per act/part
+  --containers            Types that become inline in index (comma-separated)
+                          Default: "act,part,book,folder"
+  --content               Types that become .md files (comma-separated)
+                          Default: "chapter,scene,document"
+  --nested                Use V2 nested index structure (default: true)
+  --flat                  Use flat structure (legacy V1 mode)
 ```
 
 ## Output Formats
@@ -164,6 +180,49 @@ Machine-readable JSON format (same structure as YAML).
 **Best for:**
 - API integration
 - Programmatic processing
+
+## V2 Nested Index Structure
+
+With `--index-depth 1` (default), the importer creates a hierarchical structure:
+
+```
+MyNovel/
+├── index.codex.yaml              ← Master index (references sub-indexes)
+├── book-1/
+│   ├── index.codex.yaml          ← Book 1's index
+│   ├── act-1/
+│   │   ├── chapter-01.md         ← Codex Lite content
+│   │   └── chapter-02.md
+│   └── act-2/
+│       └── chapter-03.md
+└── book-2/
+    ├── index.codex.yaml          ← Book 2's index
+    └── ...
+```
+
+**Master index uses `include:` directives:**
+```yaml
+children:
+  - include: ./book-1/index.codex.yaml
+  - include: ./book-2/index.codex.yaml
+```
+
+**Sub-indexes have containers inline with content includes:**
+```yaml
+children:
+  - id: "act-1-uuid"
+    type: act
+    name: "ACT 1"
+    children:
+      - include: ./act-1/chapter-01.md
+      - include: ./act-1/chapter-02.md
+```
+
+**Benefits:**
+- Self-contained sections (portable)
+- Git-friendly (each book is independent)
+- Preserves Scrivener binder order via array position (no `order` field needed)
+- Auto-discovery of new files via `patterns:`
 
 ## Troubleshooting
 
