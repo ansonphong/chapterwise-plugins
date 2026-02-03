@@ -10,12 +10,17 @@ Structure matches chapterwise-app file-based analysis system:
 """
 import json
 import jsonschema
+import logging
 import os
 import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Add scripts directory to path for local imports
 sys.path.insert(0, str(Path(__file__).parent))
@@ -221,7 +226,7 @@ def add_analysis_result(
     # Validate before writing
     is_valid, errors = _validate_analysis(data)
     if not is_valid:
-        print(f"Warning: Analysis validation issues: {errors}", file=sys.stderr)
+        logger.warning(f"Analysis validation issues: {errors}")
         # Continue anyway - validation is advisory
 
     # Ensure parent directory exists
@@ -236,8 +241,8 @@ def add_analysis_result(
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
-        print("Usage: analysis_writer.py <source_file> <module_name> <analysis_json>")
-        print("       analysis_writer.py <source_file> <module_name> - (reads from stdin)")
+        logger.error("Usage: analysis_writer.py <source_file> <module_name> <analysis_json>")
+        logger.error("       analysis_writer.py <source_file> <module_name> - (reads from stdin)")
         sys.exit(1)
 
     source_path = Path(sys.argv[1])
@@ -251,4 +256,4 @@ if __name__ == '__main__':
     analysis_content = json.loads(analysis_json)
 
     output_path = add_analysis_result(source_path, module_name, analysis_content)
-    print(f"Written to: {output_path}")
+    logger.info(f"Written to: {output_path}")
