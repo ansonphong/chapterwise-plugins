@@ -1,5 +1,5 @@
 ---
-name: story-beats
+name: story_beats
 displayName: Story Beats
 description: Identifies key narrative moments, turning points, and structural beats
 category: Narrative Structure

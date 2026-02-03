@@ -6,18 +6,18 @@ triggers:
   - chapterwise:analysis
   - chapterwise:analysis summary
   - chapterwise:analysis characters
-  - chapterwise:analysis plot-holes
-  - chapterwise:analysis story-beats
-  - chapterwise:analysis critical-review
+  - chapterwise:analysis plot_holes
+  - chapterwise:analysis story_beats
+  - chapterwise:analysis critical_review
   - chapterwise:analysis list
   - chapterwise:analysis help
   # Shortcuts (power users)
   - analysis
   - analysis summary
   - analysis characters
-  - analysis plot-holes
-  - analysis story-beats
-  - analysis critical-review
+  - analysis plot_holes
+  - analysis story_beats
+  - analysis critical_review
   - analysis list
   - analysis help
 ---
@@ -66,14 +66,14 @@ Analysis Modules
 
   Narrative Structure
   ├─ summary        Chapter summaries with key events
-  └─ story-beats    Key moments and turning points
+  └─ story_beats    Key moments and turning points
 
   Characters
   └─ characters     Character identification and analysis
 
   Quality Assessment
-  ├─ plot-holes     Inconsistencies and narrative gaps
-  └─ critical-review Overall quality feedback
+  ├─ plot_holes     Inconsistencies and narrative gaps
+  └─ critical_review Overall quality feedback
 ```
 
 Use the module_loader.py script to get module data, then format nicely.

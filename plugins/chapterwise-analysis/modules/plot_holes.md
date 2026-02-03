@@ -1,5 +1,5 @@
 ---
-name: plot-holes
+name: plot_holes
 displayName: Plot Hole Detection
 description: Analyzes narrative logic to identify inconsistencies, gaps, and continuity issues
 category: Quality Assessment

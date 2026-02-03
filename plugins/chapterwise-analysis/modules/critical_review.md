@@ -1,5 +1,5 @@
 ---
-name: critical-review
+name: critical_review
 displayName: Critical Review
 description: Provides overall quality assessment with strengths, weaknesses, and suggestions
 category: Quality Assessment
