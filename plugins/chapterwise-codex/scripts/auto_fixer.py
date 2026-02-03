@@ -834,17 +834,27 @@ class CodexAutoFixer:
 
         return check_time_patterns(content)
 
-    def write_fixed_codex(self, codex, fixed_content: Dict[Any, Any]) -> None:
+    def write_fixed_codex(self, codex, fixed_content: Dict[Any, Any], file_path: str = None) -> None:
         """
-        Write the fixed codex content back to the file using proper versioning system.
+        Write the fixed codex content back to the file.
+
+        Works in both web app and CLI contexts:
+        - Web app: Uses versioning system and database commits
+        - CLI: Falls back to direct file writing
 
         Args:
-            codex: Codex model instance
+            codex: Codex model instance (can be None in CLI mode)
             fixed_content: Fixed codex content
+            file_path: Optional file path for CLI mode (required if codex is None)
         """
         try:
+            # Try web app imports first
             from app.services.version_service import CodexVersionService
             from app.services.codex_file_manager import CodexFileManager
+            from app import db
+
+            # Web app mode - use versioning system
+            self.logger.info("Using web app mode with versioning")
 
             # Create a version backup before applying auto-fix
             version_service = CodexVersionService()
@@ -881,10 +891,41 @@ class CodexAutoFixer:
                 if backup_result['success']:
                     codex.file_metadata['auto_fix_backup_version'] = backup_result['version_number']
 
-            from app import db
             db.session.commit()
 
             self.logger.info(f"Successfully wrote auto-fixed codex data for {codex.id}")
+
+        except ImportError:
+            # CLI mode - fall back to direct file writing
+            import yaml
+
+            self.logger.info("Web app not available, using CLI mode for file writing")
+
+            # Determine file path
+            output_path = file_path
+            if not output_path and codex:
+                # Try to get file path from codex object
+                output_path = getattr(codex, 'file_path', None) or (
+                    codex.get_file_path() if hasattr(codex, 'get_file_path') else None
+                )
+
+            if not output_path:
+                raise ValueError("No file path available for writing. Provide file_path parameter in CLI mode.")
+
+            # Custom YAML representer for multiline strings
+            def str_representer(dumper, data):
+                """Custom representer that uses pipe syntax for multiline strings."""
+                if '\n' in data or len(data) > 80:
+                    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+                return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+
+            yaml.add_representer(str, str_representer)
+
+            # Write fixed content directly to file
+            with open(output_path, 'w', encoding='utf-8') as f:
+                yaml.dump(fixed_content, f, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
+
+            self.logger.info(f"Successfully wrote auto-fixed codex data to {output_path} (CLI mode)")
 
         except Exception as e:
             self.logger.error(f"Error writing auto-fixed codex data: {e}", exc_info=True)
