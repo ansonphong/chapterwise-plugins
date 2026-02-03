@@ -48,7 +48,7 @@ class CodexAutoFixer:
 
     def auto_fix_codex(self, codex, parsed_content: Dict[Any, Any] = None, regenerate_all_ids: bool = False) -> Tuple[Dict[Any, Any], List[str]]:
         """
-        Automatically fix common integrity issues in codex V1.0 content.
+        Automatically fix common integrity issues in Codex V1.2 content.
 
         Args:
             codex: Codex model instance (or None for standalone mode)
@@ -77,7 +77,7 @@ class CodexAutoFixer:
             if not regenerate_all_ids:
                 self._collect_valid_ids(fixed_content)
 
-            # Apply V1.0 format fixes
+            # Apply V1.2 format fixes
             fixed_content = self._ensure_v1_metadata(fixed_content)
             fixed_content = self._remove_legacy_fields(fixed_content)
             fixed_content = self._fix_missing_node_fields(fixed_content)
@@ -122,9 +122,9 @@ class CodexAutoFixer:
 
     def _ensure_v1_metadata(self, content: Dict[Any, Any]) -> Dict[Any, Any]:
         """
-        Ensure V1.0 metadata section exists and is properly formatted.
+        Ensure V1.2 metadata section exists and is properly formatted.
 
-        V1.0 Format Requirements:
+        V1.2 Format Requirements:
         - Must have 'metadata' object at root
         - metadata.formatVersion must be "1.2"
         - metadata.documentVersion recommended (defaults to "1.0.0")
@@ -133,7 +133,7 @@ class CodexAutoFixer:
             content: Parsed codex content
 
         Returns:
-            Content with proper V1.0 metadata
+            Content with proper V1.2 metadata
         """
         # Ensure metadata object exists
         if 'metadata' not in content:
@@ -166,7 +166,7 @@ class CodexAutoFixer:
 
     def _remove_legacy_fields(self, content: Dict[Any, Any]) -> Dict[Any, Any]:
         """
-        Remove legacy fields that don't belong in V1.0 format.
+        Remove legacy fields that don't belong in V1.2 format.
 
         Legacy fields to remove:
         - packetType (V0.9 field)
@@ -189,12 +189,12 @@ class CodexAutoFixer:
             legacy_fields_removed.append('packetType')
 
         if 'version' in content and 'metadata' in content:
-            # Only remove if metadata exists (meaning we're in V1.0)
+            # Only remove if metadata exists (meaning we're in V1.2)
             del content['version']
             legacy_fields_removed.append('version')
 
         if 'codexId' in content:
-            # In V1.0, we use node-level 'id' not root-level 'codexId'
+            # In V1.2, we use node-level 'id' not root-level 'codexId'
             # If there's no 'id', migrate codexId to id
             if 'id' not in content and content['codexId']:
                 content['id'] = content['codexId']
@@ -225,9 +225,9 @@ class CodexAutoFixer:
 
     def _fix_missing_node_fields(self, content: Dict[Any, Any]) -> Dict[Any, Any]:
         """
-        Fix missing required node fields in V1.0 format.
+        Fix missing required node fields in V1.2 format.
 
-        V1.0 nodes should have:
+        V1.2 nodes should have:
         - id: unique identifier (UUID recommended)
         - type: node classification
         - name or title: human-readable identifier
@@ -248,7 +248,7 @@ class CodexAutoFixer:
                         data['id'] = self._generate_new_uuid()
                         self.fixes_applied.append(f"Added missing 'id' field at {path}")
 
-                    # Fix missing type (optional in V1.0, but good practice)
+                    # Fix missing type (optional in V1.2, but good practice)
                     if 'type' not in data and path:  # Don't add type to root
                         data['type'] = 'node'
                         self.fixes_applied.append(f"Added missing 'type' field at {path}")
@@ -456,7 +456,7 @@ class CodexAutoFixer:
                                 relation['targetId'] = self._generate_new_uuid()
                                 self.fixes_applied.append(f"Added missing 'targetId' field to relation at {path}.relations[{i}]")
 
-                            # Fix missing kind (V1.0 uses 'type', but 'kind' is legacy compatibility)
+                            # Fix missing kind (V1.2 uses 'type', but 'kind' is legacy compatibility)
                             if 'kind' not in relation and 'type' not in relation:
                                 relation['type'] = 'related-to'
                                 self.fixes_applied.append(f"Added missing 'type' field to relation at {path}.relations[{i}]")
@@ -773,7 +773,7 @@ class CodexAutoFixer:
 
             return current_duration
 
-        # V1.0 format: Start traversal from root level
+        # V1.2 format: Start traversal from root level
         # Process the document itself (depth 0)
         traverse_and_calculate(data, depth=0)
 
