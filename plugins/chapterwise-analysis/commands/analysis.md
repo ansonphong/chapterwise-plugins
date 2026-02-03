@@ -24,7 +24,7 @@ triggers:
 
 # ChapterWise Analysis Command
 
-Run AI-powered literary analysis on Codex files. Results are saved to sibling `.analysis.codex.yaml` files.
+Run AI-powered literary analysis on Codex files. Results are saved to sibling `.analysis.json` files (proper Codex V1.2 format, JSON for fast parsing).
 
 ## Usage
 

@@ -77,25 +77,30 @@ autoCommit: false            # Git commit analysis files automatically
 ## Command Interface
 
 ```bash
-# Discovery & Help
-/analyze                              # Interactive picker (multi-select)
-/analyze list                         # Print all available modules
-/analyze help plot-holes              # Module details
+# Branded commands (discoverable - type /chapterwise to see all)
+/chapterwise:analysis                         # Interactive picker
+/chapterwise:analysis summary                 # Run summary module
+/chapterwise:analysis list                    # Print all modules
+
+# Shortcut commands (power users)
+/analysis                                     # Interactive picker (multi-select)
+/analysis list                                # Print all available modules
+/analysis help plot-holes                     # Module details
 
 # Direct invocation
-/analyze summary                      # Single module
-/analyze summary characters           # Multiple modules
+/analysis summary                             # Single module
+/analysis summary characters                  # Multiple modules
 
 # Targeting
-/analyze summary mybook.codex.yaml    # Specific file
-/analyze summary --node chapter-3     # Specific node by ID
-/analyze summary --glob "ch/*.codex.yaml"  # Multiple files
-/analyze summary --all                # All .codex.yaml in project
+/analysis summary mybook.codex.yaml           # Specific file
+/analysis summary --node chapter-3            # Specific node by ID
+/analysis summary --glob "ch/*.codex.yaml"    # Multiple files
+/analysis summary --all                       # All .codex.yaml in project
 
 # Behavior
-/analyze summary --force              # Re-run even if fresh
-/analyze summary --history-depth 5    # Override history retention
-/analyze summary --dry-run            # Preview what would run
+/analysis summary --force                     # Re-run even if fresh
+/analysis summary --history-depth 5           # Override history retention
+/analysis summary --dry-run                   # Preview what would run
 ```
 
 ---
@@ -1550,7 +1555,7 @@ git commit -m "docs(analyze): add custom module template for user extensions"
   },
   "plugins": [
     {
-      "name": "codex",
+      "name": "chapterwise-codex",
       "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
       "version": "1.0.0",
       "source": "./plugins/chapterwise-codex",
@@ -1566,8 +1571,8 @@ git commit -m "docs(analyze): add custom module template for user extensions"
       "category": "productivity"
     },
     {
-      "name": "analyze",
-      "description": "AI-powered literary analysis for Codex files",
+      "name": "chapterwise-analysis",
+      "description": "AI-powered literary analysis for Codex files (ChapterWise Analysis)",
       "version": "1.0.0",
       "source": "./plugins/chapterwise-analysis",
       "tags": ["analysis", "writing", "feedback", "storytelling", "ai"],
@@ -1586,35 +1591,49 @@ git commit -m "feat: add chapterwise-analysis to marketplace, rename codex"
 
 ---
 
-### Task 15: Update Plugin Namespaces
+### Task 15: Update All Plugin Namespaces (Branded + Shortcuts)
 
 **Files:**
-- Modify: `plugins/chapterwise-codex/.claude-plugin/plugin.json`
-- Verify: All command triggers use short namespace
+- Modify: `plugins/chapterwise-codex/commands/*.md` - Add branded triggers
+- Modify: `plugins/chapterwise/commands/*.md` - Verify namespace
+- Verify: All commands support both branded and shortcut triggers
 
-**Step 1: Rename chapterwise-codex to codex**
+**Step 1: Update chapterwise-codex commands**
 
-Update `plugins/chapterwise-codex/.claude-plugin/plugin.json`:
-```json
-{
-  "name": "codex",
-  ...
-}
+For each command in `plugins/chapterwise-codex/commands/`, update triggers:
+
+```yaml
+# Example for format.md
+triggers:
+  # Primary (branded - discoverable via /chapterwise)
+  - chapterwise:codex format
+  - chapterwise:codex
+  # Shortcuts (power users)
+  - codex format
+  - codex
 ```
 
-**Step 2: Verify all commands use `/codex` namespace**
+**Step 2: Update all command files**
 
-Check all command files in `plugins/chapterwise-codex/commands/` have triggers like:
-- `codex format` (not `chapterwise-codex format`)
-- `codex explode`
-- `codex implode`
-- etc.
+| Command | Branded (Primary) | Shortcut |
+|---------|-------------------|----------|
+| format | `chapterwise:codex format` | `codex format` |
+| explode | `chapterwise:codex explode` | `codex explode` |
+| implode | `chapterwise:codex implode` | `codex implode` |
+| lite | `chapterwise:codex lite` | `codex lite` |
+| index | `chapterwise:codex index` | `codex index` |
+| format-folder | `chapterwise:codex format-folder` | `codex format-folder` |
+| format-regen-ids | `chapterwise:codex format-regen-ids` | `codex format-regen-ids` |
+| convert-to-codex | `chapterwise:codex convert-to-codex` | `codex convert-to-codex` |
+| convert-to-markdown | `chapterwise:codex convert-to-markdown` | `codex convert-to-markdown` |
+| generate-tags | `chapterwise:codex generate-tags` | `codex generate-tags` |
+| update-word-count | `chapterwise:codex update-word-count` | `codex update-word-count` |
 
 **Step 3: Commit**
 
 ```bash
 git add plugins/chapterwise-codex/
-git commit -m "refactor(codex): use short /codex namespace"
+git commit -m "feat(codex): add branded /chapterwise:codex namespace with shortcuts"
 ```
 
 ---
@@ -1677,20 +1696,22 @@ git commit -m "test(analyze): verify end-to-end analysis flow"
 
 - [ ] `python3 scripts/module_loader.py list` returns 5 modules
 - [ ] `python3 scripts/staleness_checker.py <file>` returns valid JSON
-- [ ] `/analyze list` displays formatted module list
-- [ ] `/analyze summary <file>` creates `.analysis.codex.yaml`
-- [ ] `/analyze` (no args) shows category picker
-- [ ] `/analyze summary` (no file) auto-detects .codex.yaml files
+- [ ] `/chapterwise:analysis list` displays formatted module list (branded)
+- [ ] `/analysis list` displays formatted module list (shortcut)
+- [ ] `/analysis summary <file>` creates `.analysis.codex.yaml`
+- [ ] `/analysis` (no args) shows category picker
+- [ ] `/analysis summary` (no file) auto-detects .codex.yaml files
 - [ ] `--node chapter-3` extracts and analyzes specific node
 - [ ] Second run detects fresh analysis and prompts
 - [ ] `--force` flag bypasses freshness check
 - [ ] History limited to configured depth (default 3)
-- [ ] Custom modules in `~/.claude/analyze/modules/` are discovered
+- [ ] Custom modules in `~/.claude/analysis/modules/` are discovered
 - [ ] Custom modules in `.chapterwise/analysis-modules/` are discovered
-- [ ] `/analyze summary --all` spawns parallel subagents
-- [ ] marketplace.json lists all 3 plugins with correct namespaces
-- [ ] `/codex format` works (short namespace)
-- [ ] `/analyze summary` works (short namespace)
+- [ ] `/analysis summary --all` spawns parallel subagents
+- [ ] marketplace.json lists all 3 plugins
+- [ ] `/chapterwise:codex format` works (branded)
+- [ ] `/codex format` works (shortcut)
+- [ ] Typing `/chapterwise` shows all ChapterWise commands
 
 ---
 

@@ -2,9 +2,12 @@
 """
 Computes sourceHash for staleness detection.
 Checks if existing analysis is fresh or stale.
+
+Uses .analysis.json format (proper Codex V1.2 structure).
 """
 import hashlib
-import yaml
+import json
+import re
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -15,60 +18,88 @@ def compute_source_hash(content: str) -> str:
 
 
 def get_analysis_file_path(source_path: Path) -> Path:
-    """Convert source.codex.yaml -> source.analysis.codex.yaml"""
+    """Convert source.codex.yaml -> source.analysis.json
+
+    Analysis files use JSON for faster parsing (5-30x faster than YAML).
+    """
+    source_path = Path(source_path).resolve()
     name = source_path.name
-    if name.endswith('.codex.yaml'):
-        new_name = name.replace('.codex.yaml', '.analysis.codex.yaml')
-    elif name.endswith('.codex.json'):
-        new_name = name.replace('.codex.json', '.analysis.codex.json')
-    else:
-        new_name = name + '.analysis.yaml'
-    return source_path.parent / new_name
+
+    # Remove .codex.yaml, .codex.json, .codex.md extensions
+    base_name = re.sub(r'\.codex\.(yaml|yml|json|md)$', '', name, flags=re.IGNORECASE)
+
+    # If no codex extension found, just use the stem
+    if base_name == name:
+        base_name = source_path.stem
+
+    return source_path.parent / f"{base_name}.analysis.json"
 
 
 def get_current_source_hash(source_path: Path) -> Optional[str]:
     """Read source file and compute its hash."""
+    source_path = Path(source_path)
     if not source_path.exists():
         return None
-    content = source_path.read_text()
+    content = source_path.read_text(encoding='utf-8')
     return compute_source_hash(content)
 
 
+def _get_attribute(node: dict, key: str) -> Optional[str]:
+    """Get attribute value from codex node's attributes array."""
+    for attr in node.get('attributes', []):
+        if attr.get('key') == key:
+            return attr.get('value')
+    return None
+
+
 def get_analysis_source_hash(analysis_path: Path) -> Optional[str]:
-    """Read sourceHash from existing analysis file."""
+    """Read sourceHash from existing analysis file (from attributes array)."""
     if not analysis_path.exists():
         return None
 
     try:
-        content = yaml.safe_load(analysis_path.read_text())
-        return content.get('sourceHash')
-    except (yaml.YAMLError, AttributeError):
+        with open(analysis_path, 'r', encoding='utf-8') as f:
+            content = json.load(f)
+        return _get_attribute(content, 'sourceHash')
+    except (json.JSONDecodeError, AttributeError, KeyError):
         return None
 
 
 def get_module_latest_hash(analysis_path: Path, module_name: str) -> Optional[str]:
-    """Get the sourceHash from the latest run of a specific module."""
+    """Get the sourceHash from the latest entry of a specific module.
+
+    Structure (proper Codex V1.2):
+    - children[]: analysis-module nodes (id = module_name)
+      - children[]: analysis-entry nodes (sorted newest first)
+        - attributes[]: includes sourceHash
+    """
     if not analysis_path.exists():
         return None
 
     try:
-        content = yaml.safe_load(analysis_path.read_text())
+        with open(analysis_path, 'r', encoding='utf-8') as f:
+            content = json.load(f)
+
+        # Find module in children
         for child in content.get('children', []):
-            if child.get('name') == module_name:
-                history = child.get('history', [])
-                if history:
-                    return history[0].get('sourceHash')
+            if child.get('id') == module_name and child.get('type') == 'analysis-module':
+                # Get entries (children of module)
+                entries = child.get('children', [])
+                if entries:
+                    # First entry is most recent
+                    return _get_attribute(entries[0], 'sourceHash')
         return None
-    except (yaml.YAMLError, AttributeError, TypeError):
+    except (json.JSONDecodeError, AttributeError, TypeError, KeyError):
         return None
 
 
-def is_analysis_stale(source_path: Path, module_name: str = None) -> Tuple[bool, str, Optional[str]]:
+def is_analysis_stale(source_path: Path, module_name: str = None) -> Tuple[bool, Optional[str], Optional[str]]:
     """
     Check if analysis is stale for a source file.
 
     Returns: (is_stale, current_hash, existing_hash)
     """
+    source_path = Path(source_path)
     analysis_path = get_analysis_file_path(source_path)
     current_hash = get_current_source_hash(source_path)
 
@@ -86,7 +117,6 @@ def is_analysis_stale(source_path: Path, module_name: str = None) -> Tuple[bool,
 
 if __name__ == '__main__':
     import sys
-    import json
 
     if len(sys.argv) < 2:
         print("Usage: staleness_checker.py <source_file> [module_name]")
