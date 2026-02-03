@@ -3,7 +3,7 @@
 Codex Exploder Service - Extract and Modularize Codex Children
 
 This service extracts direct children from a codex file based on node type,
-saves each as a standalone V1.0 codex file, and replaces them with include
+saves each as a standalone V1.2 codex file, and replaces them with include
 directives in the parent file.
 
 This enables:
@@ -359,11 +359,11 @@ class CodexExploder:
         parent_path: str
     ) -> Dict[Any, Any]:
         """
-        Create a standalone V1.0 codex file from a child node.
+        Create a standalone V1.2 codex file from a child node.
         """
         # Build metadata
         metadata = {
-            'formatVersion': '1.0',
+            'formatVersion': '1.2',
             'documentVersion': '1.0.0',
             'created': datetime.utcnow().isoformat() + 'Z',
             'extractedFrom': parent_path
