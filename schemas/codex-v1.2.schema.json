@@ -320,5 +320,40 @@
       },
       "required": ["url"]
     }
-  }
+  },
+
+  "examples": [
+    {
+      "metadata": {
+        "formatVersion": "1.2",
+        "documentVersion": "1.0.0",
+        "created": "2026-02-02T12:00:00Z",
+        "author": "Jane Author"
+      },
+      "id": "my-novel",
+      "type": "book",
+      "name": "The Great Adventure",
+      "summary": "A tale of courage and discovery",
+      "status": "draft",
+      "attributes": [
+        { "key": "genre", "value": "fantasy", "dataType": "string" },
+        { "key": "word_count", "value": 85000, "dataType": "int" }
+      ],
+      "tags": ["fantasy", "adventure", "coming-of-age"],
+      "children": [
+        {
+          "id": "chapter-1",
+          "type": "chapter",
+          "name": "The Beginning",
+          "body": "It was a dark and stormy night when Elena first discovered the ancient map...",
+          "attributes": [
+            { "key": "word_count", "value": 3500, "dataType": "int" }
+          ]
+        },
+        {
+          "include": "./characters/elena.codex.yaml"
+        }
+      ]
+    }
+  ]
 }
