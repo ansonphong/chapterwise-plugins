@@ -342,6 +342,7 @@
       "tags": ["fantasy", "adventure", "coming-of-age"],
       "children": [
         {
+          "metadata": { "formatVersion": "1.2" },
           "id": "chapter-1",
           "type": "chapter",
           "name": "The Beginning",
