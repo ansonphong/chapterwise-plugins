@@ -174,8 +174,8 @@
       "properties": {
         "key": {
           "type": "string",
-          "description": "Attribute identifier (snake_case recommended)",
-          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+          "description": "Attribute identifier (snake_case or kebab-case, lowercase)",
+          "pattern": "^[a-z][a-z0-9_-]*$"
         },
         "name": {
           "type": "string",
