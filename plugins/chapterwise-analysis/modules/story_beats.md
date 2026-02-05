@@ -4,7 +4,7 @@ displayName: Story Beats
 description: Identifies key narrative moments, turning points, and structural beats
 category: Narrative Structure
 icon: ph ph-heartbeat
-applicableTypes: []
+applicableTypes: ["novel", "short_story", "screenplay", "theatrical_play", "immersive_experience"]
 ---
 
 # Story Beats Module

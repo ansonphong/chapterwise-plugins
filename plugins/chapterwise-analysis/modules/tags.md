@@ -4,7 +4,7 @@ displayName: Content Tags & Keywords
 description: Extracts thematic tags, locations, concepts, and motifs to categorize and index your content for easy organization and discovery.
 category: Writing Craft
 icon: ph ph-tag
-applicableTypes: []
+applicableTypes: ["novel", "short_story", "screenplay", "theatrical_play", "immersive_experience"]
 ---
 
 # Tags Analysis Module

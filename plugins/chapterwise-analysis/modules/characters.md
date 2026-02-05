@@ -4,7 +4,7 @@ displayName: Character Analysis
 description: Identifies characters, analyzes their roles, motivations, and development
 category: Characters
 icon: ph ph-users
-applicableTypes: []
+applicableTypes: ["novel", "short_story", "screenplay", "theatrical_play", "immersive_experience"]
 ---
 
 # Character Analysis Module

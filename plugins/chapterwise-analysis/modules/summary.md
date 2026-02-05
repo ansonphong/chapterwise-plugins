@@ -4,7 +4,7 @@ displayName: Chapter Summary
 description: Generates concise summaries highlighting key events, character interactions, and story developments
 category: Narrative Structure
 icon: ph ph-sparkle
-applicableTypes: []
+applicableTypes: ["novel", "short_story", "screenplay", "theatrical_play", "immersive_experience"]
 ---
 
 # Summary Analysis Module

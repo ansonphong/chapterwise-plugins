@@ -4,7 +4,7 @@ displayName: Writing Style Analysis
 description: Examines the author's unique voice, tone, pacing, literary devices, and stylistic techniques to identify distinctive writing patterns. Reviews effectiveness and clarity of narrative perspective (first-person, third-person, omniscient, etc.) and suggests clearer or more appropriate perspective shifts to enhance reader engagement.
 category: Writing Craft
 icon: ph ph-pen-nib
-applicableTypes: []
+applicableTypes: ["novel", "short_story", "screenplay", "theatrical_play", "immersive_experience"]
 ---
 
 # Writing Style Analysis Module

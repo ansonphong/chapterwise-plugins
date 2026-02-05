@@ -4,7 +4,7 @@ displayName: Critical Review
 description: Provides overall quality assessment with strengths, weaknesses, and suggestions
 category: Quality Assessment
 icon: ph ph-star
-applicableTypes: []
+applicableTypes: ["novel", "short_story", "screenplay", "theatrical_play", "immersive_experience"]
 ---
 
 # Critical Review Module
