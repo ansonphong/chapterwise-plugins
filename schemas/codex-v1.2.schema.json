@@ -130,7 +130,7 @@
       "properties": {
         "formatVersion": {
           "type": "string",
-          "enum": ["1.0", "1.1", "1.2", "lite"],
+          "enum": ["1.0", "1.1", "1.2"],
           "description": "Codex format version"
         },
         "documentVersion": {
