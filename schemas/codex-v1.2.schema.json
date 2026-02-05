@@ -11,8 +11,8 @@
     },
     "id": {
       "type": "string",
-      "description": "Unique identifier (UUID v4 recommended)",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "description": "Unique identifier (UUID v4 or simple slug)",
+      "pattern": "^[a-zA-Z0-9_-]+$|^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
     },
     "type": {
       "type": "string",
