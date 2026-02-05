@@ -112,8 +112,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Entry ID (format: entry-YYYYMMDDTHHMMSSz)",
-          "pattern": "^entry-\\d{8}T\\d{6}Z$"
+          "description": "Entry ID (format: entry-YYYYMMDDTHHMMSSZ with optional suffix)",
+          "pattern": "^entry-\\d{8}T\\d{6}Z(-[a-z0-9]+)?$"
         },
         "type": {
           "type": "string",
