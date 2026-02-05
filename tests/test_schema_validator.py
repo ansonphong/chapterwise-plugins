@@ -129,5 +129,25 @@ class TestValidateAnalysis:
         assert is_valid is False
 
 
+class TestAutoFixerValidation:
+    """Test auto-fixer produces schema-valid output."""
+
+    def test_auto_fixer_output_is_valid(self):
+        """Auto-fixer should produce schema-valid codex."""
+        from auto_fixer import CodexAutoFixer
+
+        # Minimal input that needs fixing
+        input_data = {
+            'name': 'Test',
+            'type': 'chapter'
+        }
+
+        fixer = CodexAutoFixer()
+        fixed, fixes = fixer.auto_fix_codex(None, input_data)
+
+        is_valid, errors = validate_codex(fixed)
+        assert is_valid, f"Auto-fixer output invalid: {errors}"
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])

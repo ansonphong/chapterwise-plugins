@@ -31,6 +31,14 @@ from typing import Dict, List, Any, Tuple, Optional
 from datetime import datetime
 from pathlib import Path
 
+# Schema validation (optional, for --validate flag)
+try:
+    from schema_validator import validate_codex
+    HAS_SCHEMA_VALIDATOR = True
+except ImportError:
+    HAS_SCHEMA_VALIDATOR = False
+    validate_codex = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -1292,7 +1300,8 @@ def is_codex_file(file_path: str) -> bool:
     return any(lower.endswith(ext) for ext in ['.codex.yaml', '.codex.yml', '.codex.json', '.codex'])
 
 
-def fix_single_file(file_path: str, dry_run: bool = False, verbose: bool = False, regenerate_all_ids: bool = False) -> bool:
+def fix_single_file(file_path: str, dry_run: bool = False, verbose: bool = False,
+                    regenerate_all_ids: bool = False, validate: bool = False) -> bool:
     """
     Fix a single codex or markdown file.
 
@@ -1301,6 +1310,7 @@ def fix_single_file(file_path: str, dry_run: bool = False, verbose: bool = False
         dry_run: If True, only show what would be fixed without making changes
         verbose: If True, show detailed logging
         regenerate_all_ids: If True, regenerate ALL IDs even if they're valid
+        validate: If True, validate output against JSON schema after fixing
 
     Returns:
         True if successful, False otherwise
@@ -1368,6 +1378,16 @@ def fix_single_file(file_path: str, dry_run: bool = False, verbose: bool = False
         for i, fix in enumerate(fixes, 1):
             print(f"  {i}. {fix}")
 
+        # Validate against schema if requested
+        if validate and HAS_SCHEMA_VALIDATOR:
+            is_valid, val_errors = validate_codex(fixed_content)
+            if not is_valid:
+                print(f"\n⚠️ Schema validation warnings ({len(val_errors)}):")
+                for error in val_errors[:5]:
+                    print(f"  - {error}")
+            else:
+                print("✅ Schema validation passed")
+
         # Write fixed content (unless dry run)
         if not dry_run:
             # Custom YAML representer for multiline strings
@@ -1398,7 +1418,9 @@ def fix_single_file(file_path: str, dry_run: bool = False, verbose: bool = False
         return False
 
 
-def fix_directory(directory_path: str, recursive: bool = False, dry_run: bool = False, verbose: bool = False, regenerate_all_ids: bool = False, include_markdown: bool = False) -> Tuple[int, int]:
+def fix_directory(directory_path: str, recursive: bool = False, dry_run: bool = False,
+                  verbose: bool = False, regenerate_all_ids: bool = False,
+                  include_markdown: bool = False, validate: bool = False) -> Tuple[int, int]:
     """
     Fix all codex files in a directory.
 
@@ -1409,6 +1431,7 @@ def fix_directory(directory_path: str, recursive: bool = False, dry_run: bool = 
         verbose: If True, show detailed logging
         regenerate_all_ids: If True, regenerate ALL IDs even if they're valid
         include_markdown: If True, also process .md files as Codex Lite
+        validate: If True, validate output against JSON schema after fixing
 
     Returns:
         Tuple of (successful_count, failed_count)
@@ -1449,7 +1472,7 @@ def fix_directory(directory_path: str, recursive: bool = False, dry_run: bool = 
 
     for i, file_path in enumerate(codex_files, 1):
         print(f"\n[{i}/{len(codex_files)}] ", end="")
-        if fix_single_file(file_path, dry_run, verbose, regenerate_all_ids):
+        if fix_single_file(file_path, dry_run, verbose, regenerate_all_ids, validate):
             successful += 1
         else:
             failed += 1
@@ -1501,6 +1524,8 @@ Examples:
     parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed logging')
     parser.add_argument('--re-id', action='store_true', help='Regenerate ALL IDs (even valid ones)')
     parser.add_argument('--include-md', action='store_true', help='Include .md files as Codex Lite when processing directories')
+    parser.add_argument('--validate', action='store_true',
+                        help='Validate output against JSON schema after fixing')
 
     args = parser.parse_args()
 
@@ -1511,7 +1536,7 @@ Examples:
 
     # Process file or directory
     if os.path.isfile(args.path):
-        success = fix_single_file(args.path, args.dry_run, args.verbose, args.re_id)
+        success = fix_single_file(args.path, args.dry_run, args.verbose, args.re_id, args.validate)
         sys.exit(0 if success else 1)
     elif os.path.isdir(args.path):
         successful, failed = fix_directory(
@@ -1520,7 +1545,8 @@ Examples:
             args.dry_run,
             args.verbose,
             args.re_id,
-            args.include_md
+            args.include_md,
+            args.validate
         )
         sys.exit(0 if failed == 0 else 1)
     else:
