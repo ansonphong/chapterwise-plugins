@@ -9,7 +9,6 @@ Structure matches chapterwise-app file-based analysis system:
 - Grandchildren: type "analysis-entry" (history, newest first)
 """
 import json
-import jsonschema
 import logging
 import os
 import sys
@@ -28,34 +27,17 @@ from staleness_checker import get_analysis_file_path, compute_source_hash
 
 DEFAULT_HISTORY_DEPTH = 3
 
-# Load schema for validation
-SCHEMA_DIR = Path(__file__).parent.parent.parent.parent / 'schemas'
-
-
-def _load_analysis_schema() -> Optional[dict]:
-    """Load the analysis JSON schema."""
-    schema_path = SCHEMA_DIR / 'analysis-v1.2.schema.json'
-    if schema_path.exists():
-        with open(schema_path, 'r') as f:
-            return json.load(f)
-    return None  # Schema not available, skip validation
-
-
-def _validate_analysis(data: dict) -> Tuple[bool, List[str]]:
-    """Validate analysis data against schema."""
-    schema = _load_analysis_schema()
-    if schema is None:
-        return True, []  # No schema, skip validation
-
-    validator = jsonschema.Draft202012Validator(schema)
-    errors = list(validator.iter_errors(data))
-
-    if not errors:
-        return True, []
-
-    error_msgs = [f"{'.'.join(str(p) for p in e.absolute_path)}: {e.message}"
-                  for e in errors[:5]]  # Limit to 5 errors
-    return False, error_msgs
+# Use shared schema validator
+try:
+    # Add parent scripts directory to path for cross-plugin imports
+    _codex_scripts = Path(__file__).parent.parent.parent / 'chapterwise-codex' / 'scripts'
+    if str(_codex_scripts) not in sys.path:
+        sys.path.insert(0, str(_codex_scripts))
+    from schema_validator import validate_analysis as _validate_analysis
+except ImportError:
+    # Fallback if schema_validator not available
+    def _validate_analysis(data: dict) -> Tuple[bool, List[str]]:
+        return True, []  # Skip validation
 
 
 def generate_uuid() -> str:
