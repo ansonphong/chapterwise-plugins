@@ -96,6 +96,7 @@ flowchart TD
 - `([text])` Stadium
 - `[[text]]` Subroutine
 - `>text]` Flag
+- `A@{ icon: "ph:icon-name", label: "Text" }` Icon (Phosphor)
 
 **Arrows:**
 - `-->` Arrow
@@ -389,14 +390,16 @@ architecture-beta
     group data(database)[Data Layer]
 
     service gateway(internet)[Gateway] in api
-    service auth(server)[Auth] in api
+    service auth(ph:shield-check)[Auth] in api
     service db(database)[Database] in data
 
     gateway:R --> L:auth
     auth:B --> T:db
 ```
 
-**Icons:** `cloud`, `database`, `disk`, `internet`, `server`
+**Built-in icons:** `cloud`, `database`, `disk`, `internet`, `server`
+
+**Phosphor icons:** Use any Phosphor icon with the `ph:` prefix — e.g., `(ph:house)`, `(ph:gear)`, `(ph:shield-check)`. Browse all at [phosphoricons.com](https://phosphoricons.com/).
 
 ---
 
@@ -467,6 +470,73 @@ block-beta
 
 ---
 
+### 16. Icon Nodes (Phosphor)
+
+**Best for:** Visual system diagrams, dashboards, feature overviews, navigation maps
+
+Phosphor icons are registered as a Mermaid icon pack. Use the `ph:` prefix with any icon from [phosphoricons.com](https://phosphoricons.com/).
+
+**Flowchart icon nodes:**
+```mermaid
+flowchart LR
+    home@{ icon: "ph:house", label: "Home", form: "square" }
+    settings@{ icon: "ph:gear", label: "Settings", form: "circle" }
+    users@{ icon: "ph:users", label: "Users", form: "rounded" }
+    db@{ icon: "ph:database", label: "Database", form: "square" }
+
+    home --> settings
+    home --> users
+    users --> db
+```
+
+**Icon shape parameters:**
+
+| Parameter | Values | Default | Description |
+|-----------|--------|---------|-------------|
+| `icon` | `"ph:icon-name"` | required | Phosphor icon (kebab-case) |
+| `label` | any string | none | Text label |
+| `form` | `square`, `circle`, `rounded` | `square` | Background shape |
+| `pos` | `t`, `b` | `b` | Label position |
+| `h` | number (min 48) | 48 | Icon height in px |
+
+**Common Phosphor icons for diagrams:**
+
+| Icon | Name | Use for |
+|------|------|---------|
+| `ph:house` | House | Home, landing page |
+| `ph:gear` | Gear | Settings, config |
+| `ph:users` | Users | User management |
+| `ph:database` | Database | Data storage |
+| `ph:shield-check` | Shield Check | Auth, security |
+| `ph:cloud` | Cloud | Cloud services |
+| `ph:lightning` | Lightning | Events, triggers |
+| `ph:chart-bar` | Chart Bar | Analytics, metrics |
+| `ph:envelope` | Envelope | Email, notifications |
+| `ph:globe` | Globe | Web, public |
+| `ph:lock` | Lock | Security, private |
+| `ph:robot` | Robot | AI, automation |
+| `ph:code` | Code | Development |
+| `ph:file-text` | File Text | Documents, content |
+| `ph:credit-card` | Credit Card | Payments, billing |
+
+**Architecture diagram with Phosphor icons:**
+```mermaid
+architecture-beta
+    group frontend(ph:browser)[Frontend]
+    group backend(ph:cloud)[Backend]
+
+    service app(ph:layout)[App] in frontend
+    service api(ph:plugs-connected)[API] in backend
+    service auth(ph:shield-check)[Auth] in backend
+    service db(ph:database)[Database] in backend
+
+    app:R --> L:api
+    api:R --> L:auth
+    api:B --> T:db
+```
+
+---
+
 ## Best Practices
 
 ### Choosing the Right Diagram
@@ -487,6 +557,7 @@ block-beta
 | Priorities | Quadrant |
 | Data trends | XY Chart |
 | Resource flows | Sankey |
+| Visual system maps | Icon Nodes (Phosphor) |
 
 ### General Tips
 
@@ -496,6 +567,7 @@ block-beta
 4. **Group related items** - Use subgraphs/sections
 5. **Consider direction** - `LR` for timelines, `TD` for hierarchies
 6. **Keep it readable** - Max 15-20 nodes per diagram
+7. **Use Phosphor icons** - `@{ icon: "ph:name" }` makes diagrams more scannable
 
 ### Width Recommendations
 
@@ -536,3 +608,4 @@ block-beta
 - **Test syntax** - Mermaid is sensitive to formatting
 - **Use labels** - Make relationships clear
 - **Keep it simple** - Complex diagrams are hard to read
+- **Use `ph:` prefix** for Phosphor icons in flowchart and architecture diagrams
