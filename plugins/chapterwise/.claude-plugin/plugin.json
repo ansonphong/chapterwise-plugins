@@ -1,7 +1,7 @@
 {
   "name": "chapterwise",
-  "description": "Chapterwise functions for Claude Code",
-  "version": "1.0.0",
+  "description": "Complete writing toolkit for ChapterWise — import any manuscript, run AI analysis, build story atlases, create custom readers. Supports PDF, DOCX, Scrivener, Ulysses, Markdown, and more.",
+  "version": "2.0.0",
   "homepage": "https://github.com/ansonphong/chapterwise-claude-plugins",
   "repository": "https://github.com/ansonphong/chapterwise-claude-plugins",
   "license": "MIT"

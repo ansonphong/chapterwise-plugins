@@ -1,0 +1,77 @@
+# Recipe manifest schema — shared across all recipe types
+type: object
+required: [type, version, created]
+
+properties:
+  type:
+    type: string
+    enum: [import, analysis, atlas, reader]
+    description: "Recipe type identifier"
+  version:
+    type: string
+    pattern: "^\\d+\\.\\d+$"
+    description: "Schema version"
+  created:
+    type: string
+    format: date-time
+  updated:
+    type: string
+    format: date-time
+
+  source:
+    type: object
+    properties:
+      project_path: { type: string }
+      chapter_count: { type: integer }
+      word_count: { type: integer }
+      chapter_hashes:
+        type: object
+        additionalProperties: { type: string }
+
+  manuscript:
+    type: object
+    properties:
+      title: { type: string }
+      author: { type: string }
+      type: { type: string }
+      structure: { type: string }
+
+  strategy:
+    type: object
+    description: "Import recipe: conversion strategy"
+
+  preferences:
+    type: object
+    description: "Import recipe: writer's choices"
+
+  passes:
+    type: object
+    description: "Atlas recipe: four-pass status tracking"
+
+  modules:
+    type: object
+    description: "Analysis recipe: module selections"
+
+  atlas:
+    type: object
+    description: "Atlas recipe: name, slug, output path"
+    properties:
+      name: { type: string }
+      slug: { type: string }
+      output_path: { type: string }
+
+  structure:
+    type: object
+    description: "Atlas recipe: proposed structure + sections"
+
+  output:
+    type: object
+    properties:
+      directory: { type: string }
+      file_count: { type: integer }
+      git_commit: { type: string }
+
+  updates:
+    type: array
+    description: "Atlas recipe: update history"
+    items: { type: object }
