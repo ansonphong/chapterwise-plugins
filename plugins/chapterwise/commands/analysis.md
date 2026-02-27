@@ -601,7 +601,7 @@ Follow the Language Guide exactly. Every progress message uses the formula: cook
 
 **Never:**
 - Say "recipe" — this is an internal concept only
-- Use theatrical lines: no "order up", no "bon appetit", no "chef's kiss"
+- Use theatrical lines or exaggerated cooking phrases
 - Use emojis
 - Use a cooking word without saying what it applies to: "Simmering..." alone is not acceptable
 - Replace real information with flare: the data is always the point

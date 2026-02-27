@@ -6,7 +6,6 @@ triggers:
   - chapterwise codex
   - codex yaml
   - write in codex
-  - convert to codex
   - fix codex
   - auto-fix
 ---
