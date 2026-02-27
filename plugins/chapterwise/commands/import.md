@@ -1,326 +1,552 @@
 ---
-description: "Import a folder of content (markdown, text, wiki exports) into a Chapterwise project. Guided wizard that analyzes your content, helps you choose the best structure and format, and converts everything."
+description: "Import any manuscript, project, or content folder into a ChapterWise project"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task
 triggers:
-  - import content
-  - import to chapterwise
+  - import
+  - import pdf
+  - import docx
+  - import scrivener
+  - import ulysses
+  - import manuscript
+  - import book
   - import project
-  - import world bible
-  - import wiki
-  - import docs
-  - bring into chapterwise
-  - add existing content
-argument-hint: "[path/to/content/folder]"
+  - import folder
+  - digest
+  - digest folder
+  - import novel
+argument-hint: "[path/to/file-or-folder]"
 ---
 
-# Import Content to Chapterwise
+# ChapterWise Import
 
-Import a folder of existing content (markdown files, text files, wiki exports, docs) into a well-structured Chapterwise project. This skill guides you through the process step by step — analyzing your content, helping you choose the right structure and format, then executing the conversion.
+## Overview
 
-## When This Skill Applies
-
-- User has an existing folder of markdown/text content they want to bring into Chapterwise
-- User is converting a wiki, world bible, reference docs, novel drafts, or any organized content
-- User mentions "import", "bring into chapterwise", "convert my folder", or similar
-- User points to a directory of `.md`, `.txt`, `.html`, or mixed content files
-
-## What This Skill Is NOT
-
-- **Single-file conversion** — use `/chapterwise-codex:convert-to-codex` instead
-- **Scrivener import** — use `/chapterwise-codex:import-scrivener` instead
-- **Creating new content from scratch** — use `/chapterwise-codex:format` instead
+Import any manuscript, project, or content folder into a structured ChapterWise project. This command detects the source format (PDF, DOCX, Scrivener, Ulysses, plain text, markdown folders), analyzes the manuscript structure, interviews the writer about preferences (first import only), converts everything into clean Codex files with metadata, validates the output, and saves the full configuration so re-imports are instant. The entire process is guided — the agent scans first, asks only the questions that matter, then executes the conversion with real-time progress.
 
 ---
 
-## Workflow
+## Step 1: Check for Existing Recipe
 
-Follow these 6 steps in order. Every import goes through this process.
+Before scanning or interviewing, check whether this project has been imported before.
 
-### Step 1: Discover
+**Action:** Load any saved import configuration for this project path.
 
-Scan the source directory to understand what we're working with.
-
-**If no path provided as argument:**
-- Ask the user for the path to their content folder
-
-**Once path is known:**
-
-1. List the top-level directory structure
-2. Count files by type (`.md`, `.txt`, `.html`, `.rtf`, `.yaml`, `.json`, other)
-3. Map the folder hierarchy (sections, subfolders, nesting depth)
-4. Read 3-5 representative files to understand:
-   - Content type (worldbuilding, novel, reference, mixed)
-   - Whether files have frontmatter (YAML, TOML)
-   - Average file length and depth
-   - How content is organized (by topic, chronologically, flat)
-5. Check for existing structure files (table of contents, sidebar config, navigation files, README)
-
-**Present a summary to the user:**
-
-```
-Found: [X] files across [Y] folders
-Types: [breakdown by extension]
-Structure: [description of folder organization]
-Content: [what kind of content this appears to be]
-Sample files: [list 5-8 representative filenames]
+```bash
+echo '{"project_path": "TARGET_DIR", "type": "import"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/recipe_manager.py load
 ```
 
-### Step 2: Classify
+**If a previous import configuration is found:**
 
-Ask the user two questions to understand intent.
+Report to the user with details from the saved config:
 
-**Question 1 — What is this content?**
+> "I remember this one — {title}, {chapters} chapters. Same approach, or start fresh?"
 
-Use AskUserQuestion with these options:
-- **World bible / Lore reference** — Worldbuilding, factions, magic systems, locations, characters, timelines
-- **Novel / Manuscript** — Chapters, scenes, acts, story content meant to be read in order
-- **Reference documentation** — Technical docs, guides, how-tos, knowledge base articles
-- **Mixed project** — Combination of narrative, reference, and notes
+Use AskUserQuestion to present three options:
+- **Same** — Re-run with saved settings (fast path, skip to Step 6)
+- **Adjust** — Brief follow-up questions about what to change, then re-run
+- **Start fresh** — Full interview, new approach from scratch
 
-**Question 2 — What's the goal?**
+**If "Same" is chosen:** Skip directly to Step 6 via the fast re-run path. Run the saved converter using:
 
-Use AskUserQuestion with these options:
-- **Published reference** — A beautiful, browseable project to share with readers, collaborators, or the public
-- **Private working tool** — A personal workspace for organizing, expanding, and referencing while creating
-- **Tiered access** — Some sections public (lore, guides), some private (spoilers, drafts, working notes)
-- **Showcase / demo** — Demonstrate what Chapterwise can do with this type of content
+```bash
+echo '{"recipe_path": "RECIPE_DIR"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/run_recipe.py
+```
 
-### Step 3: Structure
+**If "Adjust" is chosen:** Ask only what the user wants different, update the saved preferences, then skip to Step 6.
 
-Based on what you found in Steps 1-2, propose **2-3 structural approaches** with trade-offs. Always include your recommendation and explain why.
+**If "Start fresh" is chosen:** Continue to Step 2 as if no previous import exists.
 
-**Common approaches (adapt to the specific content):**
+**If no previous import found:** Continue to Step 2.
 
-| Approach | Best For | Description |
-|----------|----------|-------------|
-| **Section-per-file** | Wiki/lore with clear sections | Each major section becomes one file with children for sub-topics. Keeps related content together. |
-| **File-per-page** | Large projects, granular control | Every source page becomes its own file. Index organizes them into folders. Maximum flexibility. |
-| **Consolidated** | Small projects, quick reference | Fewer, richer files. Merge related pages into single documents with deep nesting. |
+---
 
-Use AskUserQuestion to let the user choose.
+## Step 2: Detect Format
 
-### Step 4: Format
+Identify the source format and gather basic file information.
 
-This is a critical choice about data format. Present it clearly and honestly.
+**Action:** Run the format detector on the source path.
 
-Use AskUserQuestion with this framing:
+```bash
+echo '{"path": "SOURCE_PATH"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/format_detector.py
+```
 
-**"Would you like to keep your content in Markdown or convert to Codex format?"**
+The detector returns format type, confidence score, file size, MIME type, and suggested pattern script.
+
+**Report to the user:**
+
+> "Scanning structure... {format}, {details}."
+
+For example:
+- "Scanning structure... PDF, 342 pages."
+- "Scanning structure... Scrivener project, 31 documents."
+- "Scanning structure... folder of 45 markdown files."
+
+**If the format is unknown or confidence is low:**
+
+Use AskUserQuestion:
+
+> "I don't recognize this format. What kind of file is this?"
 
 Options:
+- **Novel / manuscript** — Prose content with chapters
+- **Short story collection** — Multiple standalone pieces
+- **Non-fiction / reference** — Structured informational content
+- **Other** — Let the user describe it
 
-- **Markdown (Codex Lite)** — Your content stays as `.md` files with YAML frontmatter. Human-readable, editable in any text editor, Git-friendly. Chapterwise reads Markdown natively. Great if you want simplicity and maximum portability.
+---
 
-- **Codex format (.codex.yaml)** — Adds richer structure: nested children, typed attributes, relations between entries. Your data lives in YAML — an open standard. You can always convert back to Markdown if you need to. More powerful for complex, interconnected content like world bibles.
+## Step 3: Scan Structure
 
-**Important:** Regardless of which format users choose, communicate this clearly:
+Read the source content to understand its internal organization.
 
-> Either way, your content remains in open formats you control. No lock-in, no proprietary databases. Your files are plain text on your filesystem, in your Git repo. You always own your data.
+**Actions:**
 
-### Step 5: Convert
+1. Sample the source content — read the beginning (first 5-10 pages/sections), a chunk from the middle, and the end (last 5-10 pages/sections) to understand the full scope.
 
-Execute the conversion based on all decisions from Steps 1-4.
+2. Run the structure analyzer on the sampled content:
 
-#### 5a. Create output directory
+```bash
+echo '{"path": "SOURCE_PATH", "format": "DETECTED_FORMAT"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/structure_analyzer.py
+```
 
-Ask where to output the converted project:
-- Default: a new folder in the current directory named after the project
-- Or let the user specify a path
+3. Run chapter boundary detection:
 
-#### 5b. Convert content files
+```bash
+echo '{"path": "SOURCE_PATH", "format": "DETECTED_FORMAT"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/chapter_detector.py
+```
 
-**If Markdown (Codex Lite) was chosen:**
+**Identify:**
+- Document type (novel, short story collection, non-fiction, poetry, screenplay, reference)
+- Chapter/section structure (headings, numbering scheme, breaks)
+- Special sections (prologue, epilogue, dedication, appendices, author bio)
+- Metadata (title, author, if detectable)
+- Word count estimate
+- Multi-level structure (parts containing chapters, acts containing scenes)
 
-For each source file:
-1. Read the source content
-2. Extract or create YAML frontmatter with appropriate fields:
-   - `type` — Assign a semantic type based on content (faction, character, concept, location, chapter, etc.)
-   - `name` — Derive from filename, frontmatter title, or first H1
-   - `summary` — First paragraph or existing description
-   - `status` — Based on user's access tier decision (published/private/draft)
-   - `tags` — Extract from content, existing frontmatter, or folder context
-3. Clean up body content (strip old frontmatter, fix relative links)
-4. Write to output directory with clean filenames
+**Report to the user with real data:**
 
-For section-per-file structure: create one `.md` per section, using H2/H3 headings for sub-topics within each file.
+> "Three-act novel, 28 chapters, Roman numeral headings."
+> "Prologue and epilogue detected."
 
-**If Codex format was chosen:**
+Or for non-standard structures:
 
-For each section/file:
-1. Read the source content
-2. Create codex structure:
-   - `metadata.formatVersion: "1.2"`
-   - `type` — Semantic type for this content
-   - `name`, `title`, `summary` — From source
-   - `body` — Main prose content (pipe `|` for multiline)
-   - `attributes` — Structured data extracted from tables, key-value pairs, frontmatter fields
-   - `children` — Sub-sections become child nodes with their own type, name, body
-   - `tags` — For discoverability
-   - `status` — Based on access tier decision
-3. Write `.codex.yaml` files to output directory
+> "Short story collection, 12 stories, title headings with page breaks."
+> "Non-fiction, 8 sections with subsections, numbered headings."
 
-For section-per-file structure: each section file gets children for its sub-pages. Tables become attributes. Sub-headings become children.
+---
 
-**Smart type assignment:**
+## Step 4: Interview (first import only)
 
-When analyzing content, assign types intelligently based on what the content describes:
+Ask the writer about their preferences. Only questions that are relevant to this specific manuscript. This is a conversation, not a form — 1-4 questions max.
 
-| Content About | Suggested Type |
-|---------------|---------------|
-| Characters, people, NPCs | `character` |
-| Places, cities, planets | `location` |
-| Factions, organizations, groups | `faction` |
-| Magic systems, technology, abilities | `concept` |
-| History, timeline, events | `history` |
-| Items, artifacts, equipment | `item` |
-| Rules, laws, governance | `system` |
-| Story structure, plot, arcs | `story` |
-| Glossary, terminology | `reference` |
-| Creatures, species, races | `species` |
-| General overview, introduction | `overview` |
+**Skip this step entirely if re-importing with saved preferences.**
 
-#### 5c. Generate index.codex.yaml
+### Q1: Organization (ask if multi-level structure detected)
 
-Create a root `index.codex.yaml` that ties everything together:
+Use AskUserQuestion:
+
+> "I found {N} chapters in {M} parts. How would you like them organized?"
+
+Options:
+- **Folders per part** (Recommended) — `part-1/chapter-01.md`, `part-2/chapter-05.md`
+- **Flat files** — All chapters in one directory: `chapter-01.md`, `chapter-02.md`
+- **Other** — "Tell me how you'd like it"
+
+### Q2: Source metadata preservation (ask only if Scrivener or Ulysses detected)
+
+Use AskUserQuestion:
+
+> "Your {app} project has labels, status tags, and keywords. Preserve those?"
+
+Options:
+- **Yes, keep everything** (Recommended) — Labels, status, keywords become frontmatter fields and tags
+- **Just keywords as tags** — Only keywords transfer, skip labels and status
+- **Start clean** — Fresh project without source app metadata
+
+### Q3: Format (ask if agent cannot determine best choice from context)
+
+Use AskUserQuestion:
+
+> "Output as Markdown (simple, portable, great for Git) or full Codex YAML (richer structure, more features)?"
+
+Options:
+- **Markdown (Codex Lite)** (Recommended for most) — `.md` files with YAML frontmatter
+- **Codex YAML** — Full `.codex.yaml` files with nested structure
+
+Default to Markdown if the user does not express a preference.
+
+### Q4: Front/back matter (ask only if non-content sections detected in scan)
+
+Use AskUserQuestion:
+
+> "I found a dedication, author bio, and acknowledgements. Include those?"
+
+Options:
+- **As project metadata** (Recommended) — Goes into `index.codex.yaml` attributes
+- **As their own files** — Become standalone sections in the project
+- **Skip them** — Don't include at all
+
+### Questions NOT asked
+
+The agent figures these out automatically:
+- File naming conventions (always clean, slugified)
+- ID generation (always UUID)
+- Word counts (always calculated)
+- Tags (always generated from content)
+- Summaries (always extracted from first paragraph)
+- Index file (always generated)
+
+---
+
+## Step 5: Plan and Save Recipe
+
+Create the import configuration folder and save all discovered information.
+
+**Action 1:** Create the configuration folder.
+
+```bash
+echo '{"project_path": "TARGET_DIR", "type": "import"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/recipe_manager.py create
+```
+
+**Action 2:** Save the structure map with all discovered chapter boundaries, heading patterns, and document organization.
+
+Write `structure_map.yaml` to the configuration folder with:
+- Chapter boundaries (start/end positions, titles)
+- Heading pattern (regex used for detection)
+- Special sections (prologue, epilogue, front/back matter)
+- Part/act groupings if multi-level
+- Source file hash for change detection
+
+**Action 3:** Save interview answers as `preferences.yaml`:
 
 ```yaml
-metadata:
-  formatVersion: "1.2"
-  documentVersion: "1.0.0"
-  created: "[ISO timestamp]"
-
-id: index-root
-type: index
-title: "[Project Name]"
-summary: "[Project description]"
-status: private
-
-patterns:
-  include:
-    - "**/*.codex.yaml"
-    - "**/*.md"
-  exclude:
-    - "**/node_modules/**"
-    - "**/.git/**"
-    - "**/.*"
-
-typeStyles:
-  # Assign emoji + color per type used in this project
-  character:
-    emoji: "char-emoji"
-    color: "#hex"
-  # ... for each type used
-
-display:
-  defaultView: tree
-  sortBy: order
-
-children:
-  # Ordered list of all top-level files/sections
-  - name: "Section Name"
-    order: 1
-    status: published  # or private, based on user's tier decisions
-    # ... for each section
+output_format: markdown
+structure: folders_per_part
+preserve_source_metadata: true
+include_front_matter: false
+include_back_matter: false
 ```
 
-Customize typeStyles based on what types were actually used in the conversion. Pick thematically appropriate emoji for the project's genre.
+**Action 4:** Update `recipe.yaml` with the full manifest — source path, format, structure map reference, preferences reference, converter script path, and timestamps.
 
-#### 5d. Run auto-fixer
-
-If codex format was chosen, run auto-fixer on all generated files:
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py [output-directory] --recursive --verbose
-```
-
-#### 5e. Initialize git repo (optional)
-
-If the output directory is not already in a git repo, ask the user:
-
-> "Would you like me to initialize a Git repository? This is required for connecting to Chapterwise."
-
-If yes:
-```bash
-cd [output-directory] && git init && git add -A && git commit -m "Initial import from [source name]"
-```
-
-### Step 6: Report
-
-Present a clear summary of what was created:
-
-```
-Import complete!
-
-Source: [source path] ([X] files)
-Output: [output path]
-Format: [Markdown / Codex YAML]
-Structure: [description of chosen structure]
-
-Created:
-  [N] content files
-  1 index.codex.yaml
-  [list of section/file names with types]
-
-Access tiers:
-  Published: [list]
-  Private: [list]
-
-Next steps:
-  1. Review the converted files — especially check that types and summaries look right
-  2. Push to GitHub: git remote add origin <your-repo-url> && git push -u origin main
-  3. Connect the repo in Chapterwise: [your-chapterwise-url] -> Projects -> Add Git Project
-  4. Edit individual files anytime — they're plain [Markdown/YAML] in your repo
-```
+This step is internal. No user-facing message needed.
 
 ---
 
-## Handling Edge Cases
+## Step 6: Convert
 
-### Source has no clear structure (flat folder of files)
-- Propose grouping by content similarity
-- Offer to read all files and suggest a logical organization
-- Can create sections based on common themes, tags, or topics found in the content
+Execute the conversion. This is where the source becomes a ChapterWise project.
 
-### Source has mixed formats (.md, .txt, .html, .rtf)
-- Convert all to the chosen output format
-- Preserve content, strip format-specific markup
-- Note any files that couldn't be cleanly converted
+### 6a. Check dependencies
 
-### Source has images or media
-- Copy media files to output directory
-- Update references in content files
-- Note: Chapterwise handles images via URL references
+Verify that required Python packages are installed for this format:
+- PDF: PyMuPDF (`pymupdf`)
+- DOCX: python-docx (`python-docx`)
+- Scrivener: lxml (`lxml`)
+- Ulysses: No extra dependencies
+- Plain text / Markdown: No extra dependencies
 
-### Source already has YAML frontmatter
-- Preserve and migrate existing frontmatter fields
-- Map common fields (title, description, tags, date) to codex equivalents
-- Keep source-specific fields as attributes
+**Report:**
 
-### Very large projects (50+ files)
-- Use Task tool with parallel agents to convert files concurrently
-- Group conversion work by section to maintain context
-- Report progress as sections complete
+> "Checking dependencies... all set."
 
-### Source is a git repo
-- Note the remote URL for reference
-- Do NOT modify the source — always create fresh output
-- Suggest the user can set up the new repo as a separate project
+Or if something is missing:
+
+> "Missing PyMuPDF. Install with: `pip3 install pymupdf`"
+
+Use AskUserQuestion to offer installation:
+- **Install it** — Run `pip3 install {package}` automatically
+- **I'll install manually** — Pause and wait for user to confirm
+
+### 6b. Prepare output directory
+
+Create the output directory structure based on the plan. If re-importing, create a backup of existing files in `.backups/` first.
+
+### 6c. Run the converter
+
+**For known formats with existing patterns:**
+
+```bash
+echo '{"source": "SOURCE_PATH", "output": "OUTPUT_DIR", "config": "RECIPE_DIR/preferences.yaml", "structure": "RECIPE_DIR/structure_map.yaml"}' | python3 ${CLAUDE_PLUGIN_ROOT}/patterns/{format}_converter.py
+```
+
+**For formats that need a custom converter:**
+
+The agent reads 2-3 existing pattern scripts from `${CLAUDE_PLUGIN_ROOT}/patterns/` to understand the converter architecture, then writes a custom `convert.py` tailored to this manuscript. The custom script uses the same interfaces (`codex_writer.py`, `frontmatter_builder.py`) so output is consistent.
+
+Save the custom converter in the configuration folder for re-use.
+
+### 6d. Progress messaging
+
+Report progress using cooking verb + technical noun + real data. Follow the Language Guide exactly.
+
+> "Cutting chapters... {N} found."
+
+Then for each chapter:
+
+> "Cooking chapter 1: {title} ({word_count} words)"
+> "Cooking chapter 2: {title} ({word_count} words)"
+
+After all chapters:
+
+> "Seasoning metadata... tags, summaries, word counts."
+> "Building index..."
+
+For large manuscripts (20+ chapters), use parallel Task subagents:
+
+> "Cooking chapters 1-28 in parallel..."
+> "Chapters 1-14 done. 15-28 still running..."
+> "All 28 chapters processed."
+
+### 6e. Generate index
+
+Create `index.codex.yaml` with the full project hierarchy, type styles, and display configuration. This ties all converted files together into a navigable project.
 
 ---
 
-## Tips
+## Step 7: Validate and Heal
 
-- **Always scan before converting** — understand what you're working with
-- **Recommend section-per-file for world bibles** — it's the sweet spot for reference content
-- **Recommend file-per-page for novels** — each chapter should be independently addressable
-- **Match the source's mental model** — if the author organized it a certain way, preserve that intent
-- **Assign types thoughtfully** — good type assignment makes the project navigable and enables typeStyles
-- **Set status intentionally** — default to private, only publish what the user explicitly wants public
+Run validation on the converted output and auto-fix any issues.
 
-## Remember
+**Action 1:** Validate the codex output.
 
-- This is a **guided wizard**, not a batch script — take time at each step to get the user's input
-- **Never modify the source directory** — always create fresh output
-- **Data ownership is the core message** — open formats, no lock-in, user controls everything
-- **Run auto-fixer** on codex output — it catches formatting issues you won't notice
-- **The user's existing organization is valuable** — preserve their mental model unless they want to reshape it
+```bash
+echo '{"path": "OUTPUT_DIR", "fix": true}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codex_validator.py
+```
+
+The validator checks:
+- Frontmatter fields (required fields present, correct types)
+- UUIDs (valid format, no duplicates)
+- Word counts (accurate, not zero)
+- Index consistency (all files referenced, no orphans or phantoms)
+- File naming conventions
+
+With `fix: true`, the validator auto-corrects: missing fields, empty word counts, invalid UUIDs, and adds orphan files to the index.
+
+**Action 2:** Validate the saved configuration integrity.
+
+```bash
+echo '{"recipe_path": "RECIPE_DIR"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/recipe_validator.py
+```
+
+This checks that the configuration folder is complete and internally consistent — structure map matches output, preferences are valid, converter script exists.
+
+**Action 3:** Spot-check quality by reading 2-3 generated files to verify chapter breaks landed correctly and content is complete.
+
+**If fixes were applied:**
+
+> "Cleaned up {N} formatting issues."
+
+Brief summary of what was auto-corrected (e.g., "Added missing word counts to 3 files, fixed 1 duplicate UUID").
+
+**If unfixable issues remain:**
+
+Stop and surface the exact files and errors to the user:
+
+> "Chapter {N} needs manual review — {description of issue}."
+> "{file_path}: {specific error}"
+
+Do not silently skip unfixable problems.
+
+---
+
+## Step 8: Review and Save
+
+Present the final result to the user and save the configuration for future re-imports.
+
+**Action 1:** Present the output file tree.
+
+```
+my-novel/
+├── index.codex.yaml
+├── prologue.md
+├── part-1-departure/
+│   ├── chapter-01-the-awakening.md
+│   ├── chapter-02-the-call.md
+│   └── ...
+├── part-2-initiation/
+│   └── ...
+├── part-3-return/
+│   └── ...
+└── epilogue.md
+```
+
+**Action 2:** Report the summary.
+
+> "Done. {N} files, {word_count} words."
+
+**Action 3:** Update the configuration with output stats — total files, total word count, chapter count, timestamp.
+
+**Action 4:** Suggest next steps:
+
+1. Review the converted files
+2. `git init && git add -A && git push`
+3. Connect to ChapterWise.app or open in VS Code
+4. Run `/analysis` on any chapter
+
+---
+
+## Re-Import (Fast Path)
+
+When a previous import configuration is found (Step 1), the fast path avoids redundant work.
+
+**Check source file hash against the saved hash.**
+
+**If source is unchanged:**
+
+> "Your import is already up to date."
+
+Done. No work needed.
+
+**If source content changed but structure is the same:**
+
+Run the saved converter with updated source. Report only what changed.
+
+> "Scanning changes... {N} chapters modified."
+> "Cooking updated chapters..."
+> "Seasoning metadata..."
+> "Done. {N} files updated in {time}."
+
+**If the structure changed (different chapter count, new parts, etc.):**
+
+> "Your manuscript changed — {N} chapters now instead of {M}. Let me re-scan."
+
+Re-run Steps 3 through 8 with the new structure. Preserve the user's preferences from the saved configuration (no re-interview needed unless structure changes affect the organization question).
+
+---
+
+## Fallback: Unknown Formats
+
+When format_detector.py returns an unknown format or low confidence, the agent builds a custom converter.
+
+**Process:**
+
+1. Read 2-3 existing pattern scripts from `${CLAUDE_PLUGIN_ROOT}/patterns/` to understand the converter architecture — input parsing, chapter splitting, codex file generation, frontmatter building.
+
+2. Analyze the unknown source file directly — read its content, identify patterns, determine the best extraction strategy.
+
+3. Write a custom `convert.py` that follows the same conventions as existing patterns:
+   - Uses `codex_writer.py` for output generation
+   - Uses `frontmatter_builder.py` for metadata
+   - Accepts the same stdin JSON interface
+   - Outputs the same file structure
+
+4. Explain to the user:
+
+> "This is a {format} file — I'll write a custom converter using {approach}."
+
+5. Save the custom converter in the configuration folder so re-imports use it directly.
+
+6. Test the converter on a small sample before running the full conversion. If the sample output looks wrong, adjust and retry.
+
+---
+
+## Error Handling
+
+### Missing dependency
+
+> "Missing {package}. Install with: `pip3 install {package}`"
+
+Offer to install automatically via AskUserQuestion.
+
+### Conversion failure on a chapter
+
+> "Chapter {N} didn't convert cleanly — trying a different approach..."
+
+The agent adjusts the converter (different heading pattern, different split strategy, different encoding) and retries. If the retry also fails, flag the chapter for manual review and continue with the remaining chapters.
+
+### Format not recognized
+
+> "I don't recognize this format. What kind of file is this?"
+
+Use AskUserQuestion to let the user describe the format, then proceed to the unknown format fallback.
+
+### Partial failure
+
+> "{N} chapters had issues — flagged for review."
+
+Complete everything that can be converted. List the failed chapters clearly with their specific errors. The configuration records which chapters need manual attention.
+
+### Permission or access errors
+
+> "Can't read this file. Check permissions?"
+
+Never modify the source file under any circumstances.
+
+### Structure mismatch on re-import
+
+> "Your manuscript changed shape — let me re-scan."
+
+Re-run structure analysis and update the saved configuration before converting.
+
+---
+
+## Language Rules
+
+Follow the Language Guide exactly. Every progress message uses the formula: cooking verb + technical noun + real data.
+
+**Always:**
+- Pair a cooking verb with a specific technical description: "Cutting chapters... 28 found."
+- Include real data: counts, names, word counts
+- Keep progress messages brief: 5-15 words
+- Say "Done." at the end — plain, no flare
+
+**Never:**
+- Say "recipe" to the user — this is an internal concept only
+- Use theatrical or over-the-top cooking catchphrases, restaurant puns, or sign-off lines
+- Use emojis
+- Use a cooking word without saying what it applies to: "Cutting..." alone is not acceptable
+- Replace real information with flare: the data is always the point
+
+**Cooking verb reference for import phases:**
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Detect/analyze | Scanning | "Scanning structure... PDF, 342 pages." |
+| Split into chapters | Cutting | "Cutting chapters... 28 found." |
+| Convert a chapter | Cooking | "Cooking chapter 3: Into the Woods (3,100 words)" |
+| Add metadata | Seasoning | "Seasoning metadata... tags, summaries, word counts." |
+| Merge files | Blending | "Blending source files... 3 PDFs into one project." |
+| Generate index | Building | "Building index..." |
+| Check deps | Checking | "Checking dependencies... all set." |
+| Finish | Done | "Done. 31 files, 87,234 words." |
+
+---
+
+## Tool Usage Reference
+
+**Script calls — always use stdin JSON piped to python3:**
+
+```bash
+# Format detection
+echo '{"path": "SOURCE_PATH"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/format_detector.py
+
+# Structure analysis
+echo '{"path": "SOURCE_PATH", "format": "FORMAT"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/structure_analyzer.py
+
+# Chapter boundary detection
+echo '{"path": "SOURCE_PATH", "format": "FORMAT"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/chapter_detector.py
+
+# Configuration management
+echo '{"project_path": "DIR", "type": "import"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/recipe_manager.py load
+echo '{"project_path": "DIR", "type": "import"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/recipe_manager.py create
+
+# Fast re-run
+echo '{"recipe_path": "RECIPE_DIR"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/run_recipe.py
+
+# Validation
+echo '{"path": "OUTPUT_DIR", "fix": true}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codex_validator.py
+echo '{"recipe_path": "RECIPE_DIR"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/recipe_validator.py
+```
+
+**Pattern converter calls:**
+
+```bash
+echo '{"source": "SOURCE_PATH", "output": "OUTPUT_DIR", "config": "CONFIG_PATH", "structure": "STRUCTURE_PATH"}' | python3 ${CLAUDE_PLUGIN_ROOT}/patterns/{format}_converter.py
+```
+
+**User interaction — always use AskUserQuestion tool**, never inline prompts or bare text questions. Every question that requires a user decision must go through AskUserQuestion with clear labeled options.
+
+**File operations — use Read, Write, Edit, Glob, Grep** as appropriate. Never modify the source files. Always create output in a separate directory.
+
+**Parallel work — use Task tool** for large manuscripts (20+ chapters) to convert chapters concurrently. Each task is independent with no shared state.
