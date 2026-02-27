@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="{{PROJECT_TITLE}}">
+  <title>{{PROJECT_TITLE}}</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Google Fonts: Playfair Display (headings) + Source Serif 4 (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+
+  <!-- Manifest: project structure and content -->
+  <script id="manifest" type="application/json">{{MANIFEST}}</script>
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- Sidebar: table of contents + search -->
+    <nav id="sidebar" aria-label="Table of contents">
+
+      <div class="sidebar-header">
+        <div class="sidebar-title-row">
+          <h1 id="project-title" class="sidebar-title">{{PROJECT_TITLE}}</h1>
+          <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme" title="Toggle light/dark theme">
+            <span class="theme-icon">&#9788;</span>
+          </button>
+        </div>
+
+        <div id="search-box" class="search-box">
+          <label for="search-input" class="sr-only">Search</label>
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            placeholder="Search..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button id="search-clear" class="search-clear" aria-label="Clear search" hidden>&#x2715;</button>
+        </div>
+      </div>
+
+      <!-- Search results (shown when searching) -->
+      <div id="search-results" class="search-results" hidden>
+        <ul id="search-result-list" class="search-result-list" role="listbox" aria-label="Search results"></ul>
+        <p id="search-empty" class="search-empty" hidden>No results found.</p>
+      </div>
+
+      <!-- Table of contents (shown when not searching) -->
+      <div id="toc-container">
+        <ul id="toc" class="toc" role="tree" aria-label="Chapters"></ul>
+      </div>
+
+    </nav>
+
+    <!-- Mobile sidebar toggle -->
+    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span class="hamburger-icon">&#9776;</span>
+    </button>
+
+    <!-- Main reading area with annotation margin -->
+    <main id="content" role="main">
+
+      <div id="content-inner">
+
+        <!-- Reading column -->
+        <article id="reader-content" class="prose" aria-live="polite" aria-atomic="true">
+          <!-- Chapter content injected by reader.js -->
+          <div class="welcome-screen">
+            <p class="welcome-hint">Select a chapter from the sidebar to begin reading.</p>
+          </div>
+        </article>
+
+        <!-- Annotation margin (right side) -->
+        <aside id="annotation-margin" class="annotation-margin" aria-label="Annotations">
+          <!-- Footnotes and analysis annotations rendered here by reader.js -->
+        </aside>
+
+      </div>
+
+      <!-- Sequential navigation -->
+      <nav id="page-nav" class="page-nav" aria-label="Chapter navigation" hidden>
+        <a id="prev-link" class="nav-link nav-prev" href="#" rel="prev" aria-label="Previous chapter">
+          <span class="nav-arrow">&#8592;</span>
+          <span class="nav-label">Previous</span>
+          <span id="prev-title" class="nav-chapter-title"></span>
+        </a>
+        <a id="next-link" class="nav-link nav-next" href="#" rel="next" aria-label="Next chapter">
+          <span class="nav-chapter-title" id="next-title"></span>
+          <span class="nav-label">Next</span>
+          <span class="nav-arrow">&#8594;</span>
+        </a>
+      </nav>
+
+    </main>
+
+    <!-- Mobile overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay" hidden></div>
+
+    <!-- Footnote popup (positioned by JS) -->
+    <div id="footnote-popup" class="footnote-popup" role="tooltip" hidden>
+      <button id="footnote-popup-close" class="footnote-popup-close" aria-label="Close">&#x2715;</button>
+      <div id="footnote-popup-content" class="footnote-popup-content"></div>
+    </div>
+
+  </div>
+
+  <!-- Markdown renderer from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+
+  <!-- Academic reader logic -->
+  <script src="reader.js"></script>
+
+</body>
+</html>
