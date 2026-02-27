@@ -1,8 +1,7 @@
 {
   "name": "chapterwise-codex",
-  "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
-  "version": "1.1.0",
-  "homepage": "https://github.com/ansonphong/chapterwise-codex-claude",
-  "repository": "https://github.com/ansonphong/chapterwise-codex-claude",
-  "license": "MIT"
+  "description": "DEPRECATED — All commands have moved to the unified 'chapterwise' plugin. Enable chapterwise instead.",
+  "version": "1.99.0",
+  "deprecated": true,
+  "successor": "chapterwise"
 }

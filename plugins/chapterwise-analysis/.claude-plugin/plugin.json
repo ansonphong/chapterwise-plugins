@@ -1,8 +1,7 @@
 {
   "name": "chapterwise-analysis",
-  "description": "AI-powered literary analysis for Codex files (ChapterWise Analysis)",
-  "version": "1.0.0",
-  "homepage": "https://github.com/ansonphong/chapterwise-claude-plugins",
-  "repository": "https://github.com/ansonphong/chapterwise-claude-plugins",
-  "license": "MIT"
+  "description": "DEPRECATED — Analysis has moved to the unified 'chapterwise' plugin with recipe integration, courses, and genre-aware selection.",
+  "version": "1.99.0",
+  "deprecated": true,
+  "successor": "chapterwise"
 }
