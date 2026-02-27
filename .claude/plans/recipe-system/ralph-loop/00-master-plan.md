@@ -266,12 +266,12 @@ When Ralph reads this file, follow these rules:
   - Test: `ls plugins/chapterwise/.claude-plugin/plugin.json plugins/chapterwise/commands/import.md plugins/chapterwise/commands/analysis.md plugins/chapterwise/commands/atlas.md plugins/chapterwise/commands/reader.md plugins/chapterwise/commands/status.md plugins/chapterwise/commands/pipeline.md plugins/chapterwise/commands/format.md plugins/chapterwise/commands/insert.md plugins/chapterwise/modules/summary.md plugins/chapterwise/scripts/recipe_manager.py plugins/chapterwise/scripts/format_detector.py plugins/chapterwise/scripts/run_recipe.py plugins/chapterwise/scripts/codex_validator.py plugins/chapterwise/scripts/recipe_validator.py plugins/chapterwise/patterns/plaintext_converter.py plugins/chapterwise/patterns/common/chapter_detector.py plugins/chapterwise/templates/minimal-reader/index.html plugins/chapterwise/schemas/recipe.schema.yaml && echo "ALL FILES PRESENT"`
   - Files: Full inventory
 
-- [ ] **FINAL CHECKPOINT:** Full verification + final code review
+- [x] **FINAL CHECKPOINT:** Full verification + final code review
   - Test: Run all Phase 1-7 test commands sequentially
   - Review: Run `superpowers:requesting-code-review` for ALL changed files across all phases
   - **Gate:** ALL tests must pass AND review must be 100% clean
 
-- [ ] **Task 39:** Output completion promise
+- [x] **Task 39:** Output completion promise
   - When ALL tasks AND ALL checkpoints pass: `<promise>ALL CHAPTERWISE RECIPE SYSTEM TASKS COMPLETE</promise>`
 
 ---
