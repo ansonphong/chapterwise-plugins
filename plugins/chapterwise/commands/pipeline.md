@@ -1,5 +1,5 @@
 ---
-description: "Run the full ChapterWise pipeline — Import → Analysis → Atlas → Reader"
+description: "Run full pipeline: Import, Analysis, Atlas, Reader"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task
 triggers:
   - pipeline
@@ -200,8 +200,9 @@ The pipeline uses sensible defaults to minimize interaction:
 
 ## Language Rules
 
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared messaging rules.
+
+**Pipeline-specific:**
 - Use "Step N/{total}: {name}" headers for each step
-- Per-step progress follows each recipe's specific language rules
+- Per-step progress follows each command's specific language rules
 - Final summary is data-oriented (like /status)
-- Never say "recipe" in user-facing output
-- No theatrical cooking language

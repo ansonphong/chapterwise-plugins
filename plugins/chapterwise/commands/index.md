@@ -8,18 +8,19 @@ triggers:
   - codex index
   - index codex
   - setup chapterwise project
+argument-hint: "[project_directory]"
 ---
 
 # Chapterwise Codex Index Generator
 
 Generate `index.codex.yaml` files that define project structure for Chapterwise Git projects. The index controls how content is discovered, organized, and displayed.
 
-## When This Skill Applies
+## When to Apply
 
-- User wants to create an index.codex.yaml for a project
-- User wants to set up a Chapterwise Git project
-- User mentions "generate index", "codex index", or similar
-- User needs to configure include/exclude patterns
+Apply this command when the user asks to:
+- Create an index.codex.yaml for a project
+- Set up a Chapterwise Git project structure
+- Configure include/exclude patterns for a codex index
 
 ## Important Rules
 

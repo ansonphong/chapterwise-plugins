@@ -2,12 +2,13 @@
 description: Auto-fix all codex files in a folder
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
-  - fix folder
-  - autofix folder
-  - format folder
-  - fix directory
-  - fix all codex
-  - batch fix
+  - fix codex folder
+  - autofix codex folder
+  - format codex folder
+  - fix all codex files
+  - batch fix codex
+  - chapterwise:format-folder
+argument-hint: "[folder_path]"
 ---
 
 # Auto-Fix Folder

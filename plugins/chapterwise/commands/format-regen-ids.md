@@ -1,5 +1,5 @@
 ---
-description: Auto-fix codex file and regenerate ALL IDs (useful for duplicating content)
+description: "Regenerate all IDs in a codex file"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - regenerate ids
@@ -7,6 +7,7 @@ triggers:
   - new ids
   - fresh ids
   - duplicate ids
+argument-hint: "[file.codex.yaml]"
 ---
 
 # Regenerate All IDs

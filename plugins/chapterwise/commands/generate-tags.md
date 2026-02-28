@@ -7,6 +7,7 @@ triggers:
   - extract tags
   - create tags
   - tag extraction
+argument-hint: "[file.codex.yaml or file.md]"
 ---
 
 # Generate Tags

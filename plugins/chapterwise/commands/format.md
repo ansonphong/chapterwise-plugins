@@ -1,5 +1,5 @@
 ---
-description: Convert content to Chapterwise Codex format and fix formatting issues
+description: "Format content as Chapterwise Codex"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - codex format
@@ -8,18 +8,19 @@ triggers:
   - write in codex
   - fix codex
   - auto-fix
+argument-hint: "[file.codex.yaml]"
 ---
 
 # Chapterwise Codex Format V1.2
 
 Convert content to the Chapterwise Codex format - a perfectly recursive specification for **ANY structured content**. The format is infinitely flexible: invent any `type` you need. Common patterns are provided as templates, but you can create recipes, workouts, API docs, meeting notes, research papers, playlists, or literally anything else.
 
-## When This Skill Applies
+## When to Apply
 
-- User wants to create/convert content for Chapterwise
-- User mentions "codex format", "chapterwise", or "codex yaml/json"
-- User wants to run the auto-fixer on a codex file
-- User is structuring ANY content that benefits from hierarchy and metadata
+Apply this command when the user asks to:
+- Create or convert content to Chapterwise Codex format
+- Fix formatting issues in a `.codex.yaml` or `.codex.json` file
+- Structure content that benefits from hierarchy and metadata
 
 ## Output Format
 

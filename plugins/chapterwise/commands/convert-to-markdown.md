@@ -1,5 +1,5 @@
 ---
-description: Convert Codex to Codex Lite (Markdown with YAML frontmatter)
+description: "Convert Codex files to Markdown with frontmatter"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - convert to markdown
@@ -8,6 +8,7 @@ triggers:
   - codex to md
   - simplify codex
   - export to md
+argument-hint: "[input.codex.yaml]"
 ---
 
 # Convert Codex to Markdown

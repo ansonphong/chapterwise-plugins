@@ -1,5 +1,5 @@
 ---
-description: "Import a Scrivener project (.scriv) into ChapterWise format"
+description: "Import a Scrivener project into ChapterWise"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task
 triggers:
   - scrivener import

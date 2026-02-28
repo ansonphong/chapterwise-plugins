@@ -1,12 +1,13 @@
 ---
-description: Convert markdown or text files to Codex format
+description: "Convert Markdown files to Codex YAML format"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - convert to codex
   - markdown to codex
-  - make codex
   - md to codex
-  - upgrade to codex
+  - convert md to codex yaml
+  - chapterwise:convert-to-codex
+argument-hint: "[input.md]"
 ---
 
 # Convert Markdown to Codex

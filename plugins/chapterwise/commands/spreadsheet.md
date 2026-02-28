@@ -1,5 +1,5 @@
 ---
-description: Create and manage spreadsheets in Chapterwise Codex format
+description: "Create spreadsheets in Codex format"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - spreadsheet
@@ -8,18 +8,19 @@ triggers:
   - data table
   - csv to codex
   - spreadsheet yaml
+argument-hint: "[description or file.csv]"
 ---
 
 # Chapterwise Spreadsheet Content Type
 
 Create interactive spreadsheets within Codex files. Spreadsheets support formulas, column configuration, and multiple data sources.
 
-## When This Skill Applies
+## When to Apply
 
-- User wants to create a spreadsheet/data table
-- User mentions "budget", "schedule", "inventory" with tabular data
-- User wants to convert CSV to Codex format
-- User asks about spreadsheet formulas
+Apply this command when the user asks to:
+- Create a spreadsheet or data table in Codex format
+- Convert CSV data into a Codex spreadsheet
+- Build a budget, schedule, or inventory with formulas
 
 ## Output Formats
 

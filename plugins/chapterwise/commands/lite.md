@@ -1,24 +1,25 @@
 ---
-description: Create Codex Lite files (Markdown with YAML frontmatter)
+description: "Create Codex Lite Markdown with frontmatter"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - codex lite
   - lite format
-  - markdown frontmatter
-  - add frontmatter
   - codex markdown
+  - add codex frontmatter
+  - chapterwise:lite
+argument-hint: "[file.md]"
 ---
 
 # Chapterwise Codex Lite Format
 
 Add Chapterwise metadata to standard Markdown files using YAML frontmatter. Codex Lite is the **simplified format** for flat documents that don't need hierarchy.
 
-## When This Skill Applies
+## When to Apply
 
-- User wants to add metadata to a Markdown file
-- User mentions "codex lite", "frontmatter", or "markdown with metadata"
-- User has simple documents that don't need nested children
-- User wants portable files that work anywhere
+Apply this command when the user asks to:
+- Add Chapterwise metadata frontmatter to a Markdown file
+- Create a simple codex document without nested hierarchy
+- Convert a plain Markdown file to Codex Lite format
 
 ## When to Use Codex Lite vs Full Codex
 

@@ -1,5 +1,5 @@
 ---
-description: Split a codex file into separate files for each child element
+description: "Split a codex file into separate child files"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - explode codex
@@ -7,19 +7,20 @@ triggers:
   - modularize codex
   - extract children
   - break up codex
+argument-hint: "[file.codex.yaml] [--types type1,type2]"
 ---
 
 # Codex Exploder - Modularize Large Files
 
 Extract children from a codex file into separate standalone files and replace them with `include:` directives. This enables true modularity, team collaboration, and git-friendly smaller files.
 
-## When This Skill Applies
+## When to Apply
 
-- Large codex files becoming unwieldy (1000+ lines)
-- Team needs to work on different nodes without merge conflicts
-- Extracting reusable components (characters, locations, templates)
-- Organizing by type (`/characters/`, `/locations/`, etc.)
-- Git workflow optimization (smaller files = better diffs)
+Apply this command when the user asks to:
+- Split a large codex file into separate files per child element
+- Modularize a monolithic codex document for team collaboration
+- Extract specific child types into their own files
+- Organize codex children into type-based folder structures
 
 ## Script Location
 

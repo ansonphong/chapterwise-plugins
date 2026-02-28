@@ -1,5 +1,5 @@
 ---
-description: "Import any manuscript, project, or content folder into a ChapterWise project"
+description: "Import manuscripts and content into ChapterWise"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task
 triggers:
   - import
@@ -483,22 +483,9 @@ Re-run structure analysis and update the saved configuration before converting.
 
 ## Language Rules
 
-Follow the Language Guide exactly. Every progress message uses the formula: cooking verb + technical noun + real data.
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared messaging rules.
 
-**Always:**
-- Pair a cooking verb with a specific technical description: "Cutting chapters... 28 found."
-- Include real data: counts, names, word counts
-- Keep progress messages brief: 5-15 words
-- Say "Done." at the end — plain, no flare
-
-**Never:**
-- Say "recipe" to the user — this is an internal concept only
-- Use theatrical or over-the-top cooking catchphrases, restaurant puns, or sign-off lines
-- Use emojis
-- Use a cooking word without saying what it applies to: "Cutting..." alone is not acceptable
-- Replace real information with flare: the data is always the point
-
-**Cooking verb reference for import phases:**
+**Import-specific phases:**
 
 | Phase | Verb | Example |
 |-------|------|---------|

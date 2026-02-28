@@ -7,19 +7,19 @@ triggers:
   - consolidate codex
   - inline includes
   - combine codex files
+argument-hint: "[file.codex.yaml]"
 ---
 
 # Codex Imploder - Merge Includes Back Into Parent
 
 Resolve `include:` directives in a codex file, reading the referenced files and merging their content back into the parent document. This is the **inverse of the Explode operation**.
 
-## When This Skill Applies
+## When to Apply
 
-- Consolidating modular files back into a single document
-- Creating self-contained codex files for distribution
-- Simplifying structure when modularity is no longer needed
-- Archiving projects with all content inline
-- Preparing a codex for export or sharing
+Apply this command when the user asks to:
+- Merge included codex files back into a single parent document
+- Consolidate modular files for distribution or archival
+- Resolve `include:` directives by inlining their content
 
 ## Script Location
 

@@ -1,5 +1,5 @@
 ---
-description: "Build a custom reading experience for your manuscript or atlas"
+description: "Build a static HTML reader for your project"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task
 triggers:
   - reader
@@ -65,10 +65,7 @@ Read the project structure to understand what will be built.
 
 **Action:** Locate and read `index.codex.yaml`.
 
-```bash
-# Find the index file, starting from the current directory
-Glob: "**/index.codex.yaml"
-```
+Use the Glob tool with pattern `**/index.codex.yaml` to locate the project index.
 
 If no `index.codex.yaml` is found:
 
@@ -85,9 +82,10 @@ Stop. Do not proceed.
 
 **Count content files:**
 
-```bash
-Glob: "**/*.md" + "**/*.codex.yaml" (excluding index.codex.yaml itself)
-```
+Use the Glob tool to find all content files:
+- Pattern: `**/*.md`
+- Pattern: `**/*.codex.yaml`
+Exclude `index.codex.yaml` itself from the results.
 
 **Report progress:**
 
@@ -477,27 +475,17 @@ Continue building the standard reader. Report which atlas file had issues.
 
 ## Language Rules
 
-This command uses minimal cooking language. The reader build is mostly functional.
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared messaging rules.
 
-**Progress messages:**
-- "Scanning project... {N} files, {M} parts." — scan phase
-- "Building reader shell... HTML, CSS, navigation." — build phase
-- "Wiring interactivity... search, theme toggle." — wire phase
-- "Done. Open reader/index.html to preview." — completion
+**Reader-specific:** Minimal cooking language. The reader build is mostly functional.
 
-**Do not say** "recipe" to the user. The build configuration is saved silently.
+**Reader-specific phases:**
+- "Scanning project... {N} files, {M} parts." -- scan
+- "Building reader shell... HTML, CSS, navigation." -- build
+- "Wiring interactivity... search, theme toggle." -- wire
+- "Done. Open reader/index.html to preview." -- completion
+- "Assembling character cards... 14 characters." -- atlas components
+- "Building timeline... 47 events." -- atlas components
+- "Weaving theme data... 6 themes." -- atlas components
 
-**Do not say** "I'm building your reading experience!" or any theatrical framing. Just build it and report what happened.
-
-**Validation messages are plain and direct:**
-- "Fixed 2 broken links in the reader."
-- "The reader references 3 chapters that don't exist — check your project."
-
-**Iteration responses are brief:**
-- User: "Make the sidebar darker."
-- Agent: Edits `--codex-sidebar-bg` in `style.css`. "Updated. Refresh index.html to see the change."
-
-**Atlas progress uses the same functional style:**
-- "Assembling character cards... 14 characters."
-- "Building timeline... 47 events."
-- "Weaving theme data... 6 themes."
+**Iteration responses are brief:** edit the CSS variable, say "Updated. Refresh index.html to see the change."

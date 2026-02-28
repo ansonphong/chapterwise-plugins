@@ -1,5 +1,5 @@
 ---
-description: "Run AI analysis on Codex files with intelligent module selection"
+description: "Analyze Codex files with intelligent module selection"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task
 triggers:
   - analysis
@@ -123,10 +123,9 @@ Use AskUserQuestion to confirm:
 
 For each selected course, find all `.codex.yaml` and `.codex.md` files in the project:
 
-```bash
-find . -name "*.codex.yaml" -not -path "./.chapterwise/*" | head -100
-find . -name "*.codex.md" -not -path "./.chapterwise/*" | head -100
-```
+Use the Glob tool to find all codex files:
+- Pattern: `**/*.codex.yaml` — exclude any paths under `.chapterwise/`
+- Pattern: `**/*.codex.md` — exclude any paths under `.chapterwise/`
 
 For "Quick taste" (per-chapter modules on all files):
 
@@ -240,10 +239,7 @@ Read the module's full prompt content from `_content` field (the body of the mod
 
 Also read the shared output format partial:
 
-```bash
-# Read the output format specification
-cat ${CLAUDE_PLUGIN_ROOT}/modules/_output-format.md
-```
+Read the output format spec at `${CLAUDE_PLUGIN_ROOT}/modules/_output-format.md` using the Read tool.
 
 ### Step 2e: Run analysis
 
@@ -376,10 +372,9 @@ echo '{"genre": "DETECTED_GENRE"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/modul
 
 ### Step 5c: Count chapters
 
-```bash
-find . -name "*.codex.yaml" -not -path "./.chapterwise/*" | wc -l
-find . -name "*.codex.md" -not -path "./.chapterwise/*" | wc -l
-```
+Use the Glob tool to count codex files:
+- Pattern: `**/*.codex.yaml` — exclude `.chapterwise/` paths
+- Pattern: `**/*.codex.md` — exclude `.chapterwise/` paths
 
 ### Step 5d: Present the plan
 
@@ -591,22 +586,9 @@ If PyYAML is missing:
 
 ## Section 10: Language Rules
 
-Follow the Language Guide exactly. Every progress message uses the formula: cooking verb + technical noun + real data.
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared messaging rules.
 
-**Always:**
-- Pair a cooking verb with a specific technical description: "Quick taste... summary, characters, tags on 28 chapters."
-- Include real data: counts, module names, file names
-- Keep progress messages brief: 5-15 words
-- Say "Done." at the end — plain, no theatrical finish
-
-**Never:**
-- Say "recipe" — this is an internal concept only
-- Use theatrical lines or exaggerated cooking phrases
-- Use emojis
-- Use a cooking word without saying what it applies to: "Simmering..." alone is not acceptable
-- Replace real information with flare: the data is always the point
-
-**Cooking verb reference for analysis phases:**
+**Analysis-specific phases:**
 
 | Phase | Verb | Example |
 |-------|------|---------|

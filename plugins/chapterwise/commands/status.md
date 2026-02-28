@@ -1,11 +1,12 @@
 ---
-description: "Show ChapterWise project status — recipes, analysis, atlases, reader state"
+description: "Show project status and staleness overview"
 allowed-tools: Read, Grep, Glob, Bash
 triggers:
   - status
   - chapterwise status
   - project status
   - chapterwise:status
+argument-hint: ""
 ---
 
 # ChapterWise Status
@@ -134,7 +135,7 @@ Based on the state, suggest the next logical action:
 | Import only | "Run /analysis to analyze your chapters." |
 | Import + analysis | "Run /atlas to build a reference atlas." |
 | Import + analysis + atlas | "Run /reader to create a reading experience." |
-| Everything fresh | "All recipes are up to date." |
+| Everything fresh | "Everything is up to date." |
 | Stale analysis | "Run /analysis to refresh {N} changed chapters." |
 | Stale atlas | "Run /atlas --update to refresh the atlas." |
 
@@ -142,9 +143,9 @@ Show the suggestion as a `Tip:` line at the bottom of the status output.
 
 ## Language Rules
 
-- **No cooking language** in status output — this is a data dashboard
-- Use status icons: ✓ ⚠ ✗ ◌
-- Show the `.chapterwise/` file tree for transparency
-- Keep descriptions concise: one line per recipe
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for shared rules.
+
+**Status-specific:** No cooking language in status output — this is a pure data dashboard. Use symbols: ✓ ⚠ ✗ ◌
+
+- Keep descriptions concise: one line per step
 - Time formatting: "just now", "3 days ago", "2 weeks ago", "last month"
-- Never say "recipe" in the user-facing output — describe what was done, not the mechanism

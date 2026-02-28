@@ -1,5 +1,5 @@
 ---
-description: Intelligently insert notes into Chapterwise Codex manuscripts with semantic location finding
+description: "Insert notes into Codex manuscripts by location"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, Task, AskUserQuestion
 triggers:
   - insert into codex
@@ -8,19 +8,20 @@ triggers:
   - insert scene
   - batch insert
   - chapterwise insert
+argument-hint: "[instruction or --batch notes.txt]"
 ---
 
 # Chapterwise Insert
 
 Intelligently insert notes, scenes, and content into Chapterwise Codex manuscripts. Uses semantic understanding to find the right location based on natural language instructions like "after the hyperborean incursion" or "when Elena first meets Marcus."
 
-## When This Skill Applies
+## When to Apply
 
-- User wants to insert content into a codex file or manuscript
-- User has notes to add to specific locations in their writing
-- User mentions "insert", "add to manuscript", or "batch insert"
-- User wants to process a notes file with multiple insertions
-- User wants to accept or undo pending inserts
+Apply this command when the user asks to:
+- Insert content into a codex file or manuscript
+- Add notes to specific locations in their writing
+- Process a notes file with multiple batch insertions
+- Accept or undo pending inserts
 
 ## Invocation Modes
 

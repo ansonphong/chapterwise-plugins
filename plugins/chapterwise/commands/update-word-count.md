@@ -2,11 +2,12 @@
 description: Update word count metadata in codex files
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
-  - word count
   - update word count
-  - count words
-  - calculate words
-  - word statistics
+  - count codex words
+  - calculate word count
+  - codex word statistics
+  - chapterwise:update-word-count
+argument-hint: "[file_or_directory]"
 ---
 
 # Update Word Count
