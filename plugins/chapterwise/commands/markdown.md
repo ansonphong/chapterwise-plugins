@@ -2,7 +2,6 @@
 description: "Create Markdown files with ChapterWise frontmatter"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
-  - codex lite
   - codex markdown
   - markdown frontmatter
   - add chapterwise frontmatter
