@@ -1,7 +1,0 @@
-{
-  "name": "chapterwise-codex",
-  "description": "DEPRECATED — All commands have moved to the unified 'chapterwise' plugin. Enable chapterwise instead.",
-  "version": "1.99.0",
-  "deprecated": true,
-  "successor": "chapterwise"
-}

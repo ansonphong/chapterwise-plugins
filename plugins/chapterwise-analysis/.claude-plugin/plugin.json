@@ -1,7 +1,0 @@
-{
-  "name": "chapterwise-analysis",
-  "description": "DEPRECATED — Analysis has moved to the unified 'chapterwise' plugin with recipe integration, courses, and genre-aware selection.",
-  "version": "1.99.0",
-  "deprecated": true,
-  "successor": "chapterwise"
-}

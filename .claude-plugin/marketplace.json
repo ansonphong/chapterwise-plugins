@@ -10,27 +10,11 @@
   },
   "plugins": [
     {
-      "name": "chapterwise-codex",
-      "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
-      "version": "1.0.0",
-      "source": "./plugins/chapterwise-codex",
-      "tags": ["codex", "yaml", "document-management", "storytelling"],
-      "category": "productivity"
-    },
-    {
       "name": "chapterwise",
-      "description": "Chapterwise functions for Claude Code",
-      "version": "1.0.0",
+      "description": "Unified ChapterWise plugin — manuscript import, AI analysis, story atlas, static reader, codex utilities, and more",
+      "version": "2.0.0",
       "source": "./plugins/chapterwise",
-      "tags": ["codex", "manuscript", "notes", "insertion", "storytelling"],
-      "category": "productivity"
-    },
-    {
-      "name": "chapterwise-analysis",
-      "description": "AI-powered literary analysis for Codex files",
-      "version": "1.0.0",
-      "source": "./plugins/chapterwise-analysis",
-      "tags": ["analysis", "writing", "feedback", "storytelling", "ai"],
+      "tags": ["codex", "yaml", "manuscript", "analysis", "storytelling", "writing", "ai"],
       "category": "productivity"
     }
   ]
