@@ -20,7 +20,7 @@ Complete writing toolkit for ChapterWise. Import manuscripts, run AI analysis, b
 | `/format` | Format content as Codex YAML |
 | `/explode` | Split codex into child files |
 | `/implode` | Merge child files back |
-| `/lite` | Create Codex Lite Markdown |
+| `/markdown` | Create Markdown with ChapterWise frontmatter |
 | `/insert` | Insert notes by semantic location |
 | `/diagram` | Create Mermaid diagrams |
 | `/spreadsheet` | Create codex spreadsheets |

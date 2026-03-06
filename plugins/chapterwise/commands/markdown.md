@@ -1,12 +1,13 @@
 ---
-description: "Create Codex Lite Markdown with frontmatter"
+description: "Create Markdown files with ChapterWise frontmatter"
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 triggers:
   - codex lite
-  - lite format
   - codex markdown
-  - add codex frontmatter
-  - chapterwise:lite
+  - markdown frontmatter
+  - add chapterwise frontmatter
+  - chapterwise markdown
+  - chapterwise:markdown
 argument-hint: "[file.md]"
 ---
 
