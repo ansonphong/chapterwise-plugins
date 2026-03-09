@@ -29,9 +29,9 @@ Priority (later overrides earlier):
 
 If a command needs a preference that isn't set in `.claude/chapterwise.local.md`:
 
-1. Ask the user once, presenting clear options
-2. Save their answer to `.claude/chapterwise.local.md`
-3. Never ask again unless they ask to change it
+1. Apply a sensible default silently (Principle 2 — Clean Defaults)
+2. Save the applied default to `.claude/chapterwise.local.md` after the command completes
+3. The user can change it later by asking or editing the file directly
 
 ### Override vs Mutate
 
@@ -60,26 +60,20 @@ This is the per-project preferences file for all ChapterWise commands. It uses t
 
 **Format:**
 
-```yaml
+```markdown
 ---
-# ChapterWise Preferences
-
 research:
-  format: codex-md              # codex-md | codex-json
-  default_depth: standard       # standard | deep
-  output_path: null             # null = .chapterwise/research/ (default)
-
-# Add other command preferences as needed
-# analysis:
-#   default_course: quick_taste
-# reader:
-#   default_template: minimal
+  format: codex-md
+  default_depth: standard
+  output_path: null
 ---
 
-## Project Notes
+## ChapterWise Project Notes
 
 Freeform notes about this project that persist across sessions.
 ```
+
+Note: The `---` delimiters contain YAML only — no markdown headings or `#` comments that could be confused with markdown. Section headers belong in the markdown body below the closing `---`.
 
 **Rules:**
 - Create the file on first use if it doesn't exist

@@ -58,21 +58,23 @@ If preferences exist, apply them as defaults (prompt language still overrides).
 
 ---
 
-### Step 3: First-Run Preference Flow
+### Step 3: Apply Defaults (First Run)
 
-If no `research.format` preference exists, ask the user:
+If no `research.format` preference exists, default to `codex-md` silently. Do NOT ask the user — this follows Principle 2 (Clean Defaults). The first run should produce useful output without requiring preferences.
 
-Use AskUserQuestion:
+After the research completes (Step 9), save the applied defaults to `.claude/chapterwise.local.md`. Create the file if it doesn't exist. If the file exists, add the `research` section to the frontmatter without disturbing existing content.
 
-> "What format do you prefer for research output?"
+The minimal frontmatter to write:
 
-Options:
-- **Codex Markdown** (.codex.md) — Human-readable, YAML frontmatter + prose
-- **Codex JSON** (.research.json) — Machine-readable, Codex V1.2 structured format
+```yaml
+---
+research:
+  format: codex-md
+  default_depth: standard
+---
+```
 
-Save their choice to `.claude/chapterwise.local.md`. Create the file if it doesn't exist. If the file exists, add the `research` section to the frontmatter without disturbing existing content.
-
-Then proceed with research.
+The user can change preferences later by asking ("always use JSON from now on") or by editing the file directly.
 
 ---
 
@@ -143,11 +145,11 @@ When manuscript-informed:
 
 Execute the research based on resolved scope, sources, and context.
 
-**Progress message:** `"Researching {topic}..."`
+**Progress message:** `"Sourcing {topic}..."`
 
-If web-augmented: `"Researching {topic}... searching web sources."`
+If web-augmented: `"Sourcing {topic}... gathering web references."`
 
-If manuscript-informed: `"Researching {topic}... cross-referencing with manuscript."`
+If manuscript-informed: `"Sourcing {topic}... cross-referencing with manuscript."`
 
 Generate thorough, well-structured content. For deep mode, aim for comprehensive coverage. For standard mode, aim for a solid, useful reference document.
 
@@ -164,7 +166,12 @@ Examples:
 - Topic "How cyanide poisoning works" → `cyanide-poisoning.codex.md` (single file)
 - Topic "All trickster gods across mythology" (deep) → `trickster-gods/overview.codex.md` + sub-files
 
-**If updating existing research:** If a research file already exists for the same topic, update in place. Append new model credits rather than replacing.
+**If updating existing research:** Detect by matching the slugified topic against existing filenames or folder names in `.chapterwise/research/`. If a match is found:
+
+1. Use AskUserQuestion: "Research on '{topic}' already exists at {path}. Update it or create a new version?"
+   - **Update** — Merge new content into existing file. Preserve existing sections, add new ones, update the `updated` timestamp. Append new model credits.
+   - **New version** — Create a new file with a date suffix (e.g., `sumerian-gods-2026-03-09/`)
+2. When updating: preserve `depth`, `sources`, `context` from the new run. Keep all existing credits and append new ones.
 
 #### Codex Markdown Format (.codex.md)
 
@@ -178,7 +185,7 @@ context: standalone
 tags: [tag1, tag2, tag3]
 credits:
   models:
-    - Claude Opus 4.6 (Anthropic) — primary-researcher
+    - "{your-model-name} ({your-provider})" — primary-researcher
   web_sources:
     - "[Page Title](https://example.com)" (2026-03-09)
 ---
@@ -212,8 +219,8 @@ credits:
   "credits": {
     "models": [
       {
-        "name": "Claude Opus 4.6",
-        "provider": "Anthropic",
+        "name": "{your-model-name}",
+        "provider": "{your-provider}",
         "role": "primary-researcher"
       }
     ],
@@ -231,8 +238,8 @@ credits:
 
 #### Credits Rules
 
-- **`credits.models`** — Add yourself to this array. Include your model name, provider, and role. If this research is later augmented by a different model or provider, that model appends itself.
-- **`credits.webSources`** — Every WebFetch call produces a citation. Include URL, page title, and access date. Never omit a source that was actually used.
+- **`credits.models`** — Add yourself to this array. Use your actual model name (e.g., `claude-sonnet-4-6`, `claude-opus-4-6`) and provider. Do NOT hardcode a specific model — report whatever model you actually are. If this research is later augmented by a different model or provider, that model appends itself.
+- **`credits.webSources`** — Every WebFetch call produces a citation. Include URL, page title, and access date (ISO 8601). Never omit a source that was actually used. In Codex Markdown format, use: `"[Title](url)" (YYYY-MM-DD)`.
 - When updating existing research, append new credits — never replace the existing list.
 
 #### Children Structure
@@ -267,7 +274,32 @@ For multi-section research, use the `children` array (JSON) or subsections (Mark
 
 ---
 
-### Step 9: Brief the User
+### Step 9: Validate Output
+
+Run validation on all written files. This step is mandatory — run it before the completion message.
+
+For Codex JSON (`.research.json`) files:
+1. Parse as JSON — verify valid structure
+2. Verify required Codex V1.2 fields: `metadata`, `id`, `type: "research"`, `attributes`, `credits`
+3. Verify `credits.models` is non-empty (agent must have added itself)
+
+For Codex Markdown (`.codex.md`) files:
+1. Verify YAML frontmatter parses correctly
+2. Verify `type: research` is present
+3. Verify credits section exists in frontmatter
+
+If available, run the codex validator:
+```bash
+echo '{"path": ".chapterwise/research/{topic-slug}/", "fix": true}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codex_validator.py
+```
+
+- If all clean: say nothing — validation is invisible.
+- If auto-fixed: note fixes silently and proceed.
+- If unfixable issues: report them to the user before the brief.
+
+---
+
+### Step 10: Brief the User
 
 Report what was created:
 
@@ -310,10 +342,11 @@ Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules
 
 | Phase | Verb | Example |
 |-------|------|---------|
-| Start research | Researching | "Researching Sumerian mythology..." |
-| Web search | Searching | "Searching web sources... 5 relevant pages found." |
+| Start research | Sourcing | "Sourcing Sumerian mythology..." |
+| Web search | Gathering | "Gathering web references... 5 relevant pages found." |
 | Manuscript scan | Cross-referencing | "Cross-referencing with manuscript... 3 chapters mention Enlil." |
-| Writing output | Writing | "Writing research files... 5 entries." |
+| Structuring output | Distilling | "Distilling research... 5 entries across 3 sections." |
+| Writing files | Assembling | "Assembling research files... 5 entries." |
 | Completion | Done | "Done. 5 research files saved to .chapterwise/research/sumerian-gods/." |
 
 ---
@@ -327,4 +360,4 @@ Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules
 | Web fetch fails on a URL | Skip that source, continue with others. Do not cite failed fetches. |
 | Output directory not writable | Report the error and suggest an alternative path. |
 | Manuscript referenced but no codex files found | "No Codex project found here. Running standalone research instead." Set context to `standalone`. |
-| Existing research file found for same topic | Update in place. Append new credits. Merge content intelligently. |
+| Existing research file found for same topic | Ask user: update existing or create new version. See Step 8 update flow. |

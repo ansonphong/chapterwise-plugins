@@ -3,7 +3,6 @@ description: "Deep research — generate a multi-document compendium on any topi
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, Task, WebSearch, WebFetch, Agent
 triggers:
   - research:deep
-  - deep research
   - chapterwise:research:deep
 argument-hint: "<topic or instruction>"
 ---
@@ -37,18 +36,18 @@ Everything else — preferences, credits, manuscript-awareness, format — works
 
 Follow the exact same command flow as `${CLAUDE_PLUGIN_ROOT}/commands/research.md`, with these overrides:
 
-1. **Depth is always `deep`** — regardless of saved preference or prompt wording. The user chose `/research:deep` explicitly.
+1. **Depth is locked to `deep`** — When loading preferences in Step 2, skip `research.default_depth`. Depth is set by the command variant (Preference Cascade, priority 3) and cannot be overridden by saved preferences. Only prompt language can override (e.g., "just a quick overview").
 
 2. **Structure defaults to multi-file** — create a folder with:
    - `overview.codex.md` (or `.research.json`) — High-level synthesis, table of contents, key themes
    - Individual files per major entity or subtopic — one file per god, per technique, per historical figure, etc.
    - The agent judges how to subdivide based on the topic's natural structure
 
-3. **Web search is strongly favored** — for deep research, default to web-augmented unless the user explicitly says "no web" or the topic is extremely well-known.
+3. **Web search is strongly favored** — for deep research, default to web-augmented unless the user explicitly says "no web" or the topic is extremely well-known. If web search returns nothing, fall back to LLM knowledge and set `sources: llm-knowledge`.
 
 4. **Progress messages reflect depth:**
-   - `"Deep research: {topic}... mapping {N} subtopics."`
-   - `"Researching {subtopic}... {M} of {N}."`
+   - `"Sourcing deep compendium: {topic}... mapping {N} subtopics."`
+   - `"Distilling {subtopic}... {M} of {N}."`
    - `"Done. {N} research files saved to {path}."`
 
 ---
@@ -84,3 +83,14 @@ Even in deep mode, the user's prompt controls everything:
 - "deep research trickster gods, organize by cultural region" → region folders instead of per-deity files
 
 The user's word is final. `/research:deep` sets the default depth, not a hard constraint.
+
+---
+
+## Deep Mode Edge Cases
+
+| Situation | Response |
+|-----------|----------|
+| Topic doesn't naturally subdivide | Produce a single deep file with thorough content. Don't force artificial subdivision. |
+| Web search returns nothing | Fall back to LLM knowledge. Set `sources: llm-knowledge`. Proceed with deep content from training data. |
+| Very narrow topic (e.g., "deep research cyanide poisoning") | Produce a single comprehensive file with deep detail, not multiple files on sub-aspects unless the content warrants it. |
+| User says "just a single file" | Obey. Deep content in one file. Prompt language overrides structure default. |
