@@ -30,7 +30,7 @@ DEFAULT_HISTORY_DEPTH = 3
 # Use shared schema validator
 try:
     # Add parent scripts directory to path for cross-plugin imports
-    _codex_scripts = Path(__file__).parent.parent.parent / 'chapterwise-codex' / 'scripts'
+    _codex_scripts = Path(__file__).parent.parent.parent / 'chapterwise' / 'scripts'
     if str(_codex_scripts) not in sys.path:
         sys.path.insert(0, str(_codex_scripts))
     from schema_validator import validate_analysis as _validate_analysis
