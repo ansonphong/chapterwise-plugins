@@ -157,6 +157,107 @@ def update(data):
     return {"success": True, "recipe_path": recipe_path}
 
 
+def scan(data):
+    """Scan a project directory for codex files and metadata."""
+    project = data["project_path"]
+
+    codex_files = []
+    for root, dirs, files in os.walk(project):
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        for f in files:
+            if f.endswith('.codex.yaml') or f.endswith('.codex.md'):
+                codex_files.append(os.path.relpath(os.path.join(root, f), project))
+
+    index_path = os.path.join(project, 'index.codex.yaml')
+    index_data = {}
+    if os.path.isfile(index_path):
+        with open(index_path) as fh:
+            index_data = yaml.safe_load(fh) or {}
+
+    return {
+        "project_path": project,
+        "codex_files": sorted(codex_files),
+        "file_count": len(codex_files),
+        "index_found": os.path.isfile(index_path),
+        "title": index_data.get("name", index_data.get("title")),
+        "type": index_data.get("type"),
+    }
+
+
+def save(data):
+    """Save a full recipe with all metadata (used by atlas after build)."""
+    project = data.get("project_path", ".")
+    rtype = data["type"]
+    atlas_data = data.get("atlas", {})
+    name = atlas_data.get("name") or data.get("name")
+
+    folder_name = f"{rtype}-recipe"
+    if name and rtype == "atlas":
+        slug = atlas_data.get("slug", name.lower().replace(" ", "-"))
+        if slug != "atlas":
+            folder_name = f"atlas-recipe-{slug}"
+
+    recipe_dir = os.path.join(project, ".chapterwise", folder_name)
+    os.makedirs(recipe_dir, exist_ok=True)
+
+    now = datetime.now(timezone.utc).isoformat()
+    recipe = {
+        "type": rtype,
+        "version": "1.0",
+        "created": now,
+        "updated": now,
+    }
+
+    for key in data:
+        if key not in ("project_path", "type", "name"):
+            recipe[key] = data[key]
+
+    recipe_path = os.path.join(recipe_dir, "recipe.yaml")
+    with open(recipe_path, "w") as f:
+        yaml.dump(recipe, f, default_flow_style=False, sort_keys=False)
+
+    return {"success": True, "recipe_path": recipe_path, "folder": recipe_dir}
+
+
+def patch(data):
+    """Patch specific fields in a recipe. Appends to arrays (like update history) rather than replacing."""
+    project = data.get("project_path", ".")
+    rtype = data.get("type", "atlas")
+    patch_data = data.get("patch", {})
+
+    name = data.get("name")
+    folder_name = f"{rtype}-recipe"
+    if name and rtype == "atlas":
+        folder_name = f"atlas-recipe-{name}"
+
+    recipe_path = os.path.join(project, ".chapterwise", folder_name, "recipe.yaml")
+    if not os.path.isfile(recipe_path):
+        return {"success": False, "error": "recipe.yaml not found"}
+
+    with open(recipe_path) as f:
+        recipe = yaml.safe_load(f)
+
+    for key, value in patch_data.items():
+        if key == "update_entry":
+            if "updates" not in recipe:
+                recipe["updates"] = []
+            recipe["updates"].append(value)
+        elif key == "chapter_hashes":
+            recipe["chapter_hashes"] = value
+        else:
+            if isinstance(value, dict) and isinstance(recipe.get(key), dict):
+                recipe[key].update(value)
+            else:
+                recipe[key] = value
+
+    recipe["updated"] = datetime.now(timezone.utc).isoformat()
+
+    with open(recipe_path, "w") as f:
+        yaml.dump(recipe, f, default_flow_style=False, sort_keys=False)
+
+    return {"success": True, "recipe_path": recipe_path}
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "list"
     data = json.load(sys.stdin)
@@ -167,6 +268,9 @@ if __name__ == "__main__":
         "list": list_recipes,
         "validate": validate,
         "update": update,
+        "scan": scan,
+        "save": save,
+        "patch": patch,
     }
 
     if cmd not in commands:
