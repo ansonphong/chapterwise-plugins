@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 # Add scripts to path
-sys.path.insert(0, str(Path(__file__).parent.parent / 'plugins' / 'chapterwise-codex' / 'scripts'))
+sys.path.insert(0, str(Path(__file__).parent.parent / 'plugins' / 'chapterwise' / 'scripts'))
 from schema_validator import SchemaValidator, validate_codex, validate_analysis
 
 
