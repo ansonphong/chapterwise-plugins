@@ -642,6 +642,12 @@ matched_after: "{matched_escaped}"
             backup_path=backup_path
         )
 
+    # Flexible block pattern: matches INSERT markers regardless of field order
+    _BLOCK_PATTERN = re.compile(
+        r'[ \t]*<!-- INSERT\s*\n((?:(?!-->)[^\n]*\n)*?)[ \t]*-->\s*\n(.*?)\n[ \t]*<!-- /INSERT -->',
+        re.DOTALL | re.MULTILINE
+    )
+
     def find_pending_inserts(self, file_path: str) -> List[PendingInsert]:
         """
         Find all pending INSERT markers in a file.
@@ -657,20 +663,6 @@ matched_after: "{matched_escaped}"
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Pattern to match INSERT blocks
-        pattern = re.compile(
-            r'<!-- INSERT\s*\n'
-            r'time:\s*([^\n]+)\n'
-            r'source:\s*([^\n]+)\n'
-            r'instruction:\s*"([^"]*)"\n'
-            r'confidence:\s*([^\n]+)\n'
-            r'matched_after:\s*"([^"]*)"\n'
-            r'-->\s*\n'
-            r'(.*?)\n'
-            r'<!-- /INSERT -->',
-            re.DOTALL
-        )
-
         # Find line numbers
         lines = content.split('\n')
         char_to_line = {}
@@ -679,11 +671,27 @@ matched_after: "{matched_escaped}"
             char_to_line[char_count] = i
             char_count += len(line) + 1  # +1 for newline
 
-        for match in pattern.finditer(content):
+        for match in self._BLOCK_PATTERN.finditer(content):
+            header = match.group(1)
+            body = match.group(2).strip()
+
+            # Parse fields from header (order-independent)
+            def extract_field(name, default=''):
+                m = re.search(rf'{name}:\s*"?([^"\n]*)"?', header)
+                return m.group(1).strip() if m else default
+
+            time_val = extract_field('time')
+            source_val = extract_field('source')
+            instruction_val = extract_field('instruction')
+            matched_val = extract_field('matched_after')
+
+            confidence_match = re.search(r'confidence:\s*([0-9.]+)', header)
+            confidence_val = float(confidence_match.group(1)) if confidence_match else 0.0
+
             # Find line number
             start_pos = match.start()
             line_number = 1
-            for char_pos, line_num in char_to_line.items():
+            for char_pos, line_num in sorted(char_to_line.items()):
                 if char_pos <= start_pos:
                     line_number = line_num
                 else:
@@ -692,12 +700,12 @@ matched_after: "{matched_escaped}"
             pending.append(PendingInsert(
                 file_path=file_path,
                 line_number=line_number,
-                time=match.group(1).strip(),
-                source=match.group(2).strip(),
-                instruction=match.group(3),
-                confidence=float(match.group(4).strip()),
-                matched_after=match.group(5),
-                content=match.group(6).strip()
+                time=time_val,
+                source=source_val,
+                instruction=instruction_val,
+                confidence=confidence_val,
+                matched_after=matched_val,
+                content=body
             ))
 
         return pending
@@ -732,51 +740,29 @@ matched_after: "{matched_escaped}"
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Find all inserts
-        pending = self.find_pending_inserts(file_path)
-
-        if not pending:
-            return 0, errors
-
-        # If indices specified, filter
-        if indices:
-            indices_set = set(indices)
-            pending_to_accept = [p for i, p in enumerate(pending, 1) if i in indices_set]
-        else:
-            pending_to_accept = pending
-
-        # Pattern to match and replace INSERT blocks
-        pattern = re.compile(
-            r'<!-- INSERT\s*\n'
-            r'time:\s*[^\n]+\n'
-            r'source:\s*[^\n]+\n'
-            r'instruction:\s*"[^"]*"\n'
-            r'confidence:\s*[^\n]+\n'
-            r'matched_after:\s*"[^"]*"\n'
-            r'-->\s*\n'
-            r'(.*?)\n'
-            r'<!-- /INSERT -->',
-            re.DOTALL
+        # Use flexible block pattern (field-order-independent)
+        # Capture group 1 = content between markers
+        accept_pattern = re.compile(
+            r'[ \t]*<!-- INSERT\s*\n(?:(?!-->)[^\n]*\n)*?[ \t]*-->\s*\n(.*?)\n[ \t]*<!-- /INSERT -->',
+            re.DOTALL | re.MULTILINE
         )
 
-        # Replace with just the content
         accepted_count = 0
+        match_counter = 0
+        indices_set = set(indices) if indices else None
 
         def replace_insert(match):
-            nonlocal accepted_count
+            nonlocal accepted_count, match_counter
+            match_counter += 1
             content_only = match.group(1)
 
-            # Check if this insert should be accepted
-            if indices:
-                # Find which index this is
-                current_index = len(list(pattern.finditer(content[:match.start()]))) + 1
-                if current_index not in indices_set:
-                    return match.group(0)  # Keep unchanged
+            if indices_set and match_counter not in indices_set:
+                return match.group(0)  # Keep unchanged
 
             accepted_count += 1
             return content_only
 
-        new_content = pattern.sub(replace_insert, content)
+        new_content = accept_pattern.sub(replace_insert, content)
 
         # Write file
         with open(file_path, 'w', encoding='utf-8') as f:
@@ -814,36 +800,27 @@ matched_after: "{matched_escaped}"
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Pattern to match INSERT blocks
-        pattern = re.compile(
-            r'<!-- INSERT\s*\n'
-            r'time:\s*[^\n]+\n'
-            r'source:\s*[^\n]+\n'
-            r'instruction:\s*"[^"]*"\n'
-            r'confidence:\s*[^\n]+\n'
-            r'matched_after:\s*"[^"]*"\n'
-            r'-->\s*\n'
-            r'.*?\n'
-            r'<!-- /INSERT -->\n?',
-            re.DOTALL
+        # Flexible block pattern (field-order-independent)
+        reject_pattern = re.compile(
+            r'[ \t]*<!-- INSERT\s*\n(?:(?!-->)[^\n]*\n)*?[ \t]*-->\s*\n.*?\n[ \t]*<!-- /INSERT -->\n?',
+            re.DOTALL | re.MULTILINE
         )
 
-        # Remove matching blocks
         rejected_count = 0
+        match_counter = 0
         indices_set = set(indices) if indices else None
 
         def remove_insert(match):
-            nonlocal rejected_count
+            nonlocal rejected_count, match_counter
+            match_counter += 1
 
-            if indices_set:
-                current_index = len(list(pattern.finditer(content[:match.start()]))) + 1
-                if current_index not in indices_set:
-                    return match.group(0)
+            if indices_set and match_counter not in indices_set:
+                return match.group(0)
 
             rejected_count += 1
             return ''
 
-        new_content = pattern.sub(remove_insert, content)
+        new_content = reject_pattern.sub(remove_insert, content)
 
         # Write file
         with open(file_path, 'w', encoding='utf-8') as f:
