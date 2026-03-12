@@ -262,3 +262,91 @@ class TestAcceptRejectInserts:
         assert 'Insert content 1' in content
         assert 'Insert content 2' not in content
         assert 'Insert content 3' in content
+
+
+class TestInsertCodexYamlRuamel:
+    """Test ruamel.yaml insertion path."""
+
+    def setup_method(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def teardown_method(self):
+        shutil.rmtree(self.tmpdir)
+
+    def _has_ruamel(self):
+        try:
+            import ruamel.yaml
+            return True
+        except ImportError:
+            return False
+
+    def test_markers_survive_ruamel_roundtrip(self):
+        """B4: INSERT markers must not be corrupted by ruamel.yaml dump."""
+        if not self._has_ruamel():
+            pytest.skip("ruamel.yaml not installed")
+
+        content = """type: chapter
+name: "Test Chapter"
+body: |
+  Dawn broke over the frozen plains.
+
+  Elena watched from the ramparts.
+
+  Night fell and the camp grew silent.
+children: []
+"""
+        path = os.path.join(self.tmpdir, 'test.codex.yaml')
+        with open(path, 'w') as f:
+            f.write(content)
+
+        engine = InsertEngine()
+        result = engine.insert(
+            file_path=path,
+            content="The scouts returned.",
+            line_number=3,
+            insert_after=True,
+            source="test",
+            instruction='after "the ramparts"',
+            confidence=0.87,
+            matched_after="Elena watched from the ramparts.",
+            create_backup=False,
+            add_markers=True
+        )
+
+        assert result.success
+
+        # Markers must be parseable after ruamel roundtrip
+        pending = engine.find_pending_inserts(path)
+        assert len(pending) == 1
+        assert pending[0].content == "The scouts returned."
+        assert pending[0].confidence == 0.87
+
+    def test_accept_after_ruamel_insert(self):
+        """Markers inserted via ruamel must be acceptable."""
+        if not self._has_ruamel():
+            pytest.skip("ruamel.yaml not installed")
+
+        content = """type: chapter
+name: "Test"
+body: |
+  Line one.
+  Line two.
+children: []
+"""
+        path = os.path.join(self.tmpdir, 'test.codex.yaml')
+        with open(path, 'w') as f:
+            f.write(content)
+
+        engine = InsertEngine()
+        engine.insert(
+            file_path=path,
+            content="New line.",
+            line_number=1,
+            insert_after=True,
+            create_backup=False,
+            add_markers=True
+        )
+
+        count, errors = engine.accept_inserts(path, create_backup=False)
+        assert count == 1
+        assert errors == []

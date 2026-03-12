@@ -489,8 +489,9 @@ matched_after: "{matched_escaped}"
         # Insert content
         body_lines.insert(insert_index, insert_content)
 
-        # Update body
-        doc['body'] = '\n'.join(body_lines)
+        # Force literal block scalar to preserve markers exactly
+        from ruamel.yaml.scalarstring import LiteralScalarString
+        doc['body'] = LiteralScalarString('\n'.join(body_lines))
 
         # Write file
         with open(file_path, 'w', encoding='utf-8') as f:
