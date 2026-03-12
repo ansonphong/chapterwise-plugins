@@ -231,6 +231,28 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/implode_codex.py project.codex.yaml
 - **Metadata updates:** `exploded` metadata is removed, `imploded` metadata is added
 - **Run auto-fixer** after imploding to ensure the merged file is valid
 
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| File not found | "File not found: {path}" |
+| Include target missing | "Included file not found: {include_path} — skipping." |
+| No include directives found | "No include directives found in {path}." |
+| Invalid YAML/JSON in included file | "Cannot parse included file {path} — skipping." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {file} for includes..." |
+| Processing | Folding | "Folding {N} files back into parent..." |
+| Completion | Done | "Done. {N} includes merged into {file}." |
+
 ## Explode/Implode Cycle
 
 ```

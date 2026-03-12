@@ -211,3 +211,25 @@ else:
 | Extract everything | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml` |
 | Preview extraction | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --dry-run` |
 | Custom folder structure | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/explode_codex.py story.codex.yaml --output-pattern "./content/{type}/{name}.codex.yaml"` |
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| File not found | "File not found: {path}" |
+| No children to extract | "No children found in {path} matching the specified types." |
+| Output file already exists | "File already exists: {output_path} — use --force to overwrite." |
+| Invalid YAML/JSON syntax | "Cannot parse {path} — check for syntax errors." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {file} for children..." |
+| Processing | Slicing | "Slicing {N} children into separate files..." |
+| Completion | Done | "Done. {N} files extracted to {folder}." |

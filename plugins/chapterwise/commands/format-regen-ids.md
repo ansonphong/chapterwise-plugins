@@ -53,3 +53,25 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py /path/to/file.codex.yaml --r
 3. Run the auto-fixer with `--re-id` flag
 4. Report the number of IDs regenerated
 5. Warn user that relation targetIds now point to new IDs (may need manual update if referencing external files)
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| File not found | "File not found: {path}" |
+| Invalid YAML/JSON syntax | "Cannot parse {path} — check for syntax errors." |
+| No IDs found to regenerate | "No id or targetId fields found in {path}." |
+| Write permission denied | "Cannot write to {path} — check file permissions." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {file} for IDs..." |
+| Processing | Slicing | "Slicing old IDs... regenerating {N} fresh UUIDs." |
+| Completion | Done | "Done. {N} IDs regenerated in {file}." |

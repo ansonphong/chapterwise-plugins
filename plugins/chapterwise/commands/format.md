@@ -425,3 +425,25 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/auto_fixer.py /path/to/directory -r -d -v
 - **Invent types freely** - `type: grocery-list` is just as valid as `type: character`
 - **Mix and match** - a `project` can have children of type `task`, `note`, `reference`, `milestone`
 - **Always run auto-fixer** - it catches issues you won't notice
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| File not found | "File not found: {path}" |
+| Invalid YAML/JSON syntax | "Cannot parse {path} — check for syntax errors near line {N}." |
+| Missing `metadata.formatVersion` | "No formatVersion found. Adding `metadata.formatVersion: 1.2`." |
+| Write permission denied | "Cannot write to {path} — check file permissions." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {file}..." |
+| Processing | Seasoning | "Seasoning metadata... IDs, types, attributes." |
+| Completion | Done | "Done. {file} formatted." |

@@ -98,3 +98,25 @@ Summary:
   Total: 15
 ============================================================
 ```
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| Directory not found | "Directory not found: {path}" |
+| No codex files found | "No codex files found in {path}." |
+| Permission error on file | "Cannot write to {file} — skipping. Check permissions." |
+| Partial failure | "{N} of {total} files had errors — see details above." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {folder}..." |
+| Processing | Seasoning | "Seasoning {N} codex files..." |
+| Completion | Done | "Done. {N} files formatted, {M} skipped." |
