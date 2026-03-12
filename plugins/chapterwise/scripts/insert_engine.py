@@ -90,7 +90,7 @@ class InsertEngine:
             Format string: 'codex-yaml', 'codex-lite', 'markdown', or 'unknown'
         """
         path = Path(file_path)
-        ext = path.suffix.lower()
+        name_lower = path.name.lower()
 
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -98,14 +98,16 @@ class InsertEngine:
         except Exception:
             return 'unknown'
 
+        # Check for .codex.yaml / .codex.yml files (compound extension)
+        if name_lower.endswith('.codex.yaml') or name_lower.endswith('.codex.yml'):
+            return 'codex-yaml'
+
         # Check for .codex files
-        if ext == '.codex':
-            if self.CODEX_YAML_PATTERN.search(content):
-                return 'codex-yaml'
-            return 'codex-yaml'  # Assume YAML for .codex
+        if path.suffix.lower() == '.codex':
+            return 'codex-yaml'
 
         # Check for markdown files
-        if ext == '.md':
+        if path.suffix.lower() == '.md':
             if self.CODEX_LITE_PATTERN.match(content):
                 return 'codex-lite'
             return 'markdown'
