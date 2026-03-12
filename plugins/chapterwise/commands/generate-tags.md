@@ -109,3 +109,25 @@ tags:
 - Use `--format detailed` to see which words occur most
 - Run `--dry-run` first to preview the tags
 - Use `--follow-includes` for projects with modular files
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| File not found | "File not found: {path}" |
+| No body content to analyze | "No body text found in {path} — nothing to tag." |
+| Content too short for meaningful tags | "Content is very short ({N} words). Try `--min-count 1` for results." |
+| Invalid YAML/JSON syntax | "Cannot parse {path} — check for syntax errors." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {file} for content..." |
+| Processing | Reducing | "Reducing text to top {N} tags..." |
+| Completion | Done | "Done. {N} tags generated for {file}." |

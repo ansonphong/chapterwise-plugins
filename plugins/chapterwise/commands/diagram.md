@@ -129,3 +129,24 @@ architecture-beta
 - Unquoted special characters in labels
 - Wrong keyword (e.g., `graph` vs `flowchart`)
 - Forgetting direction after `flowchart`
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| Invalid Mermaid syntax | "Mermaid syntax error — check for missing spaces around arrows or unquoted labels." |
+| Unsupported diagram type | "Diagram type '{type}' is not supported by Mermaid. See supported types above." |
+| File not found for include | "Diagram file not found: {path}" |
+| Write permission denied | "Cannot write to {path} — check file permissions." |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning requirements..." |
+| Processing | Assembling | "Assembling {diagram_type} diagram..." |
+| Completion | Done | "Done. Diagram added to {file}." |

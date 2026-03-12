@@ -25,3 +25,25 @@ This is a Scrivener-specific import. Follow the full import workflow from `impor
    - Research folder → skip (unless writer requests)
 
 All other steps (recipe check, interview, conversion, validation, review) follow `import.md` exactly.
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| .scriv bundle not found | "Scrivener project not found: {path}" |
+| Missing .scrivx manifest | "No .scrivx file found inside {path} — is this a valid Scrivener project?" |
+| Unsupported Scrivener version | "This looks like Scrivener {version}. Only Scrivener 3 projects are supported." |
+| RTF conversion failure | "Cannot convert RTF document: {file} — try exporting as plain text from Scrivener first." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning Scrivener project..." |
+| Processing | Assembling | "Assembling codex from {N} binder items..." |
+| Completion | Done | "Done. {N} files imported from Scrivener project." |

@@ -195,3 +195,24 @@ User: "Create equipment inventory"
 - **Use Excel-style formulas** (`=A1+B1`, not `=[@column]`)
 - **Capital letters in formulas** for cell references
 - **Test formulas** with sample data to verify they work
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| CSV parse error | "Cannot parse CSV data — check for unescaped commas or mismatched quotes." |
+| Invalid formula syntax | "Formula error in cell {cell}: {detail}." |
+| Include file not found | "Spreadsheet file not found: {path}" |
+| Write permission denied | "Cannot write to {path} — check file permissions." |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning data requirements..." |
+| Processing | Assembling | "Assembling spreadsheet... {N} rows, {M} columns." |
+| Completion | Done | "Done. Spreadsheet added to {file}." |

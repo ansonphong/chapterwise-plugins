@@ -205,3 +205,25 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/index_generator.py . -v
 - Types auto-detect from extensions
 - Status must be set per-item
 - Patterns use gitignore syntax
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| Directory not found | "Directory not found: {path}" |
+| No codex files discovered | "No codex files found matching patterns in {path}." |
+| index.codex.yaml already exists | "Index already exists at {path}. Overwrite? (y/n)" |
+| Write permission denied | "Cannot write to {path} — check file permissions." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {directory} for codex files..." |
+| Processing | Assembling | "Assembling index... {N} files discovered." |
+| Completion | Done | "Done. index.codex.yaml created with {N} entries." |

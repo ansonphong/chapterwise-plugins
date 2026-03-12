@@ -481,3 +481,15 @@ New content here...
 4. **Report clearly** - show what was done and where
 5. **Handle errors gracefully** - never leave files in inconsistent state
 6. **Respect user intent** - when in doubt, ask
+
+---
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning manuscript for insert location..." |
+| Processing | Folding | "Folding note into {file} at line {N}..." |
+| Completion | Done | "Done. {N} notes inserted, {M} pending review." |

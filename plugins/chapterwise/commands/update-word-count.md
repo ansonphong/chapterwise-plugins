@@ -159,3 +159,25 @@ Warnings:
 4. Run word counter
 5. Report: entities updated, total words, files modified
 6. List any warnings (missing includes, etc.)
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| File not found | "File not found: {path}" |
+| No body content found | "No body fields found in {path} — nothing to count." |
+| Include file missing | "Included file not found: {include_path} — skipping." |
+| Invalid YAML/JSON syntax | "Cannot parse {path} — check for syntax errors." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {file} for body fields..." |
+| Processing | Reducing | "Reducing word counts... {N} entities found." |
+| Completion | Done | "Done. {N} entities updated, {total} total words." |
