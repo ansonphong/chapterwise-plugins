@@ -1,0 +1,7 @@
+type: chapter
+name: "Included Chapter"
+title: "The Included Chapter"
+summary: "This chapter is included via directive."
+body: |
+  Content of the included chapter.
+children: []

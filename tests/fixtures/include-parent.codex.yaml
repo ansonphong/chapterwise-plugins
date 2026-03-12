@@ -1,0 +1,7 @@
+type: project
+name: "Test Project"
+title: "Test Project"
+summary: "A test project with includes."
+body: ""
+children:
+  - include: "./include-child.codex.yaml"
