@@ -350,3 +350,79 @@ children: []
         count, errors = engine.accept_inserts(path, create_backup=False)
         assert count == 1
         assert errors == []
+
+
+class TestInsertCodexLineBasedMarkers:
+    """Test that line-based YAML insertion preserves findable markers (B8)."""
+
+    def setup_method(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def teardown_method(self):
+        shutil.rmtree(self.tmpdir)
+
+    def test_markers_findable_after_line_based_insert(self):
+        """B8: Markers inserted via line-based fallback must be parseable."""
+        content = """type: chapter
+name: "Test Chapter"
+body: |
+  Dawn broke over the frozen plains.
+  Elena watched from the ramparts.
+  Night fell and the camp grew silent.
+children: []
+"""
+        path = os.path.join(self.tmpdir, 'test.codex.yaml')
+        with open(path, 'w') as f:
+            f.write(content)
+
+        engine = InsertEngine()
+        # Force line-based path
+        engine._insert_codex = engine._insert_codex_line_based
+
+        result = engine.insert(
+            file_path=path,
+            content="Scouts returned at dusk.",
+            line_number=2,
+            insert_after=True,
+            source="test",
+            instruction="after ramparts",
+            confidence=0.88,
+            matched_after="Elena watched from the ramparts.",
+            create_backup=False,
+            add_markers=True
+        )
+        assert result.success
+
+        # Markers must be findable even inside YAML body
+        pending = engine.find_pending_inserts(path)
+        assert len(pending) == 1, f"Expected 1 pending insert, found {len(pending)}"
+        assert pending[0].content == "Scouts returned at dusk."
+
+    def test_accept_after_line_based_insert(self):
+        """Markers inserted via line-based path must be acceptable."""
+        content = """type: chapter
+name: "Test"
+body: |
+  Line one.
+  Line two.
+children: []
+"""
+        path = os.path.join(self.tmpdir, 'test.codex.yaml')
+        with open(path, 'w') as f:
+            f.write(content)
+
+        engine = InsertEngine()
+        engine._insert_codex = engine._insert_codex_line_based
+
+        engine.insert(
+            file_path=path,
+            content="New line.",
+            line_number=1,
+            insert_after=True,
+            create_backup=False,
+            add_markers=True
+        )
+
+        count, errors = engine.accept_inserts(path, create_backup=False)
+        assert count == 1
+        assert errors == []

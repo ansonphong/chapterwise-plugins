@@ -608,10 +608,17 @@ matched_after: "{matched_escaped}"
         else:
             insert_content = content
 
-        # Add proper indentation for YAML body
+        # Add proper indentation for YAML body content.
+        # Marker lines (<!-- INSERT/-->/<!-- /INSERT -->) stay at column 0
+        # so find_pending_inserts can find them regardless of indent tolerance.
+        # Plain content lines get 2-space indent to match YAML body block.
         indented_lines = []
         for line in insert_content.split('\n'):
-            indented_lines.append('  ' + line)  # 2-space indent for body content
+            stripped = line.strip()
+            if stripped.startswith('<!-- INSERT') or stripped == '-->' or stripped == '<!-- /INSERT -->':
+                indented_lines.append(line)
+            else:
+                indented_lines.append('  ' + line)
         insert_content = '\n'.join(indented_lines)
 
         if not insert_content.endswith('\n'):
