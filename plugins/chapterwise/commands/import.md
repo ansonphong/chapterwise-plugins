@@ -483,6 +483,7 @@ Re-run structure analysis and update the saved configuration before converting.
 
 ## Language Rules
 
+Read and follow `${CLAUDE_PLUGIN_ROOT}/references/principles.md` — especially **LLM Judgment, User Override**.
 Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared messaging rules.
 
 **Import-specific phases:**

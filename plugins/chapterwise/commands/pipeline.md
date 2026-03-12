@@ -200,6 +200,7 @@ The pipeline uses sensible defaults to minimize interaction:
 
 ## Language Rules
 
+Read and follow `${CLAUDE_PLUGIN_ROOT}/references/principles.md` — especially **LLM Judgment, User Override**.
 Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared messaging rules.
 
 **Pipeline-specific:**

@@ -143,6 +143,7 @@ Show the suggestion as a `Tip:` line at the bottom of the status output.
 
 ## Language Rules
 
+Read and follow `${CLAUDE_PLUGIN_ROOT}/references/principles.md` — especially **LLM Judgment, User Override**.
 Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for shared rules.
 
 **Status-specific:** No cooking language in status output — this is a pure data dashboard. Use symbols: ✓ ⚠ ✗ ◌

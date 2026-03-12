@@ -475,6 +475,7 @@ Continue building the standard reader. Report which atlas file had issues.
 
 ## Language Rules
 
+Read and follow `${CLAUDE_PLUGIN_ROOT}/references/principles.md` — especially **LLM Judgment, User Override**.
 Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared messaging rules.
 
 **Reader-specific:** Minimal cooking language. The reader build is mostly functional.

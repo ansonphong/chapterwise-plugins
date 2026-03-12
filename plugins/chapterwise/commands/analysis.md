@@ -586,6 +586,7 @@ If PyYAML is missing:
 
 ## Section 10: Language Rules
 
+Read and follow `${CLAUDE_PLUGIN_ROOT}/references/principles.md` — especially **LLM Judgment, User Override**.
 Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared messaging rules.
 
 **Analysis-specific phases:**
