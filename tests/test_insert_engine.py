@@ -426,3 +426,92 @@ children: []
         count, errors = engine.accept_inserts(path, create_backup=False)
         assert count == 1
         assert errors == []
+
+
+class TestInsertIntegration:
+    """End-to-end integration tests."""
+
+    def setup_method(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.engine = InsertEngine()
+
+    def teardown_method(self):
+        shutil.rmtree(self.tmpdir)
+
+    def test_full_lifecycle_markdown(self):
+        """Insert -> find -> accept lifecycle on markdown file."""
+        src = str(FIXTURES / 'sample-lite.md')
+        path = os.path.join(self.tmpdir, 'chapter.md')
+        shutil.copy(src, path)
+
+        # Insert with markers
+        result = self.engine.insert(
+            file_path=path, content="New scene content.",
+            line_number=5, insert_after=True,
+            source="test", instruction="after ramparts",
+            confidence=0.9, matched_after="Elena watched from the ramparts.",
+            create_backup=False, add_markers=True
+        )
+        assert result.success
+
+        # Find pending
+        pending = self.engine.find_pending_inserts(path)
+        assert len(pending) == 1
+        assert pending[0].content == "New scene content."
+
+        # Accept
+        count, errors = self.engine.accept_inserts(path, create_backup=False)
+        assert count == 1
+        assert errors == []
+
+        # Verify clean
+        pending_after = self.engine.find_pending_inserts(path)
+        assert len(pending_after) == 0
+
+        with open(path) as f:
+            final = f.read()
+        assert "New scene content." in final
+        assert "<!-- INSERT" not in final
+
+    def test_full_lifecycle_codex_yaml(self):
+        """Insert -> find -> accept lifecycle on codex YAML file."""
+        src = str(FIXTURES / 'sample.codex.yaml')
+        path = os.path.join(self.tmpdir, 'chapter.codex.yaml')
+        shutil.copy(src, path)
+
+        result = self.engine.insert(
+            file_path=path, content="Scouts returned at dusk.",
+            line_number=3, insert_after=True,
+            source="test", instruction="after scouts appeared",
+            confidence=0.92, matched_after="the first scouts appeared",
+            create_backup=False, add_markers=True
+        )
+        assert result.success
+
+        pending = self.engine.find_pending_inserts(path)
+        assert len(pending) == 1
+
+        count, errors = self.engine.accept_inserts(path, create_backup=False)
+        assert count == 1
+
+        with open(path) as f:
+            final = f.read()
+        assert "Scouts returned at dusk." in final
+        assert "<!-- INSERT" not in final
+
+    def test_backup_creation(self):
+        """Backups are created in .backups/ directory."""
+        src = str(FIXTURES / 'sample-lite.md')
+        path = os.path.join(self.tmpdir, 'chapter.md')
+        shutil.copy(src, path)
+
+        engine = InsertEngine(backup_dir=os.path.join(self.tmpdir, '.backups'))
+        result = engine.insert(
+            file_path=path, content="Test.",
+            line_number=1, insert_after=True,
+            create_backup=True, add_markers=False
+        )
+
+        assert result.success
+        assert result.backup_path is not None
+        assert os.path.exists(result.backup_path)
