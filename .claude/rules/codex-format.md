@@ -37,5 +37,27 @@ Content in standard Markdown...
 ## Validation
 
 - Always run `codex_validator.py` after generating codex output
-- Schema files live in `schemas/` (codex-v1.2.schema.json, analysis-v1.2.schema.json)
+- Schema files live in `schemas/` (codex-v1.2.schema.json, analysis-v1.2.schema.json, research-v1.2.schema.json)
 - Silent on success — only report auto-fixes and unfixable issues
+
+## Schema Resolution
+
+Schema files are at the **repository root** in `schemas/`:
+
+```
+schemas/
+├── codex-v1.2.schema.json
+├── analysis-v1.2.schema.json
+└── research-v1.2.schema.json
+```
+
+The `schema_validator.py` script resolves schemas relative to itself:
+`Path(__file__).parent.parent.parent.parent / 'schemas'`
+(from `plugins/chapterwise/scripts/` → repo root → `schemas/`)
+
+When invoking validation from commands, use:
+```bash
+echo '{"path": "./output/", "fix": true}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codex_validator.py
+```
+
+The validator finds schemas automatically — no path argument needed.
