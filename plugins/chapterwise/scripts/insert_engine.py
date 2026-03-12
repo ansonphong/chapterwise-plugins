@@ -531,31 +531,43 @@ matched_after: "{matched_escaped}"
         body_start = -1
         body_end = len(lines)
         in_body = False
-        body_indent = 0
+        body_indent = -1  # Will be set from first content line
 
         for i, line in enumerate(lines):
             stripped = line.lstrip()
-            current_indent = len(line) - len(stripped)
+            current_indent = len(line) - len(line.lstrip())
 
-            if stripped.startswith('body:'):
-                body_start = i + 1
-                body_indent = current_indent
-                in_body = True
+            if not in_body:
+                if stripped.startswith('body:'):
+                    body_start = i + 1
+                    in_body = True
 
-                # Check for inline body
-                if '|' in stripped or '>' in stripped:
-                    # Block scalar
+                    # Detect block scalar indicator (| or >)
+                    after_body = stripped[5:].strip()
+                    if after_body and after_body[0] in ('|', '>'):
+                        # Block scalar — body indent determined by first content line
+                        body_indent = -1
+                    elif after_body:
+                        # Inline body value — single line, not a block
+                        body_end = i + 1
+                        in_body = False
+                    else:
+                        # Empty body: or next line
+                        body_indent = -1
+
+            else:
+                # Inside body block scalar
+                if stripped == '':
+                    # Blank lines are allowed inside body
                     continue
-                elif stripped == 'body:':
-                    # Empty body or next line
-                    continue
-                else:
-                    # Inline body - not supported well
-                    pass
 
-            elif in_body:
-                # Check if we've left the body
-                if stripped and not line.startswith(' ') and ':' in stripped:
+                if body_indent == -1:
+                    # First content line determines the body indent level
+                    body_indent = current_indent
+
+                # A line at column 0 (or less than body indent) with a YAML key
+                # pattern means we've exited the block scalar
+                if current_indent < body_indent and stripped:
                     body_end = i
                     break
 
