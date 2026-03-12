@@ -221,3 +221,25 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lite_helper.py document.md --init
 - **No hierarchy** - use full Codex for nested children
 - **No relations** - use full Codex for entity relationships
 - **Portable** - works with any Markdown renderer
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| File not found | "File not found: {path}" |
+| Invalid YAML frontmatter | "Frontmatter syntax error in {path} — check for missing quotes or colons." |
+| File is not markdown | "Expected a .md file but got {ext}." |
+| Write permission denied | "Cannot write to {path} — check file permissions." |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {file}..." |
+| Processing | Seasoning | "Seasoning frontmatter... type, tags, status." |
+| Completion | Done | "Done. {file} updated." |

@@ -117,3 +117,25 @@ body: |
 4. Run conversion
 5. Report success and output file path
 6. Optionally run auto-fixer on the result
+
+---
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| File not found | "File not found: {path}" |
+| No YAML frontmatter detected | "No frontmatter found in {path} — treating entire file as body content." |
+| Unsupported input format | "Expected a .md file but got {ext}. Convert manually or rename." |
+| Output file already exists | "Output file already exists: {output_path} — overwrite? (y/n)" |
+| Missing PyYAML dependency | "Missing PyYAML. Install with: `pip3 install pyyaml`" |
+
+## Language Rules
+
+Follow `${CLAUDE_PLUGIN_ROOT}/references/language-rules.md` for all shared rules.
+
+| Phase | Verb | Example |
+|-------|------|---------|
+| Start | Scanning | "Scanning {file}..." |
+| Processing | Assembling | "Assembling codex from markdown frontmatter..." |
+| Completion | Done | "Done. {output_file} created." |
