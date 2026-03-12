@@ -31,6 +31,14 @@ plugins/chapterwise/
 - **Validation after output** — run `codex_validator.py` after generating codex, silent on success.
 - **User preferences** in `.claude/chapterwise.local.md` (user's project, not this repo).
 
+## Brand Voice
+
+> **Canonical reference:** `../../.claude/references/brand-voice.md` — read before writing ANY user-facing text.
+
+A confident technical mentor who treats writing as engineering. Philosophy first, features second. Developer metaphors are the identity ("IDE for Writers," "debug your plot"), not decoration. Honest capability, zero hype. Chaos → Clarity. Ownership always (open formats, no lock-in). Never theatrical, never condescending, never vague. Writer-facing text says "manuscript" not "file," "chapter" not "node," "project" not "repo." Analysis reads like editorial feedback. Errors: "[What went wrong] — [What to do about it]." Progress: specific data, no filler.
+
+Plugin output is the most voice-intensive surface — analysis reports, progress messages, command descriptions, and atlas narratives all speak directly to writers. See also `references/language-rules.md` for cooking-verb conventions.
+
 ## Modular Rules
 
 See `.claude/rules/` for topic-specific rules:
