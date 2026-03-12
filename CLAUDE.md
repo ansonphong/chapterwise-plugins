@@ -1,47 +1,65 @@
-# ChapterWise Plugins — Project Instructions
+# ChapterWise Plugins — Claude Code Writing Toolkit
 
-## Project Overview
-
-This is the ChapterWise Claude Code plugin — a complete writing toolkit for manuscript import, AI analysis, story atlas generation, and custom readers. The plugin lives at `plugins/chapterwise/`.
+Complete writing toolkit for manuscript import, AI analysis, story atlas generation, and custom readers. 24 slash commands, 32 analysis modules, 25+ Python scripts, 7 format converters.
 
 ## Architecture
 
 ```
 plugins/chapterwise/
-├── .claude-plugin/plugin.json   # Plugin manifest
+├── .claude-plugin/plugin.json   # Plugin manifest (auto-discovered)
 ├── commands/                    # Slash commands (YAML frontmatter + markdown)
-├── modules/                     # 32 analysis modules
-├── scripts/                     # Python utilities (stdin JSON, stdout JSON)
-├── patterns/                    # Format conversion patterns
-├── templates/                   # Reader HTML templates
-└── references/                  # Shared rules and principles
+├── modules/                     # 32 analysis modules (4 courses)
+├── scripts/                     # Python utilities (stdin JSON → stdout JSON)
+├── patterns/                    # Format conversion patterns + common utilities
+├── templates/                   # Reader HTML templates (minimal, academic)
+├── references/                  # principles.md, language-rules.md, insert specs
+└── schemas/                     # Codex V1.2, analysis, research, recipe schemas
 ```
 
 ## Core Principles
 
-Read `plugins/chapterwise/references/principles.md` before working on any command. Key principles:
-
-1. **LLM Judgment, User Override** — The agent makes smart decisions but always yields to user preferences. Preference cascade: plugin defaults → `.claude/chapterwise.local.md` → command variant → prompt language.
-2. **Clean Defaults, Rich Options** — Commands work with zero config. First run produces useful output without asking questions.
-3. **Data Over Flare** — Progress messages include real data. No theatrical language. See `references/language-rules.md`.
-
-## Plans
-
-All implementation plans and design documents go in `.claude/plans/`.
-
-When creating new plans, always use: `.claude/plans/YYYY-MM-DD-<topic>.md` or `.claude/plans/<topic>/` for multi-file plans.
-
-When a plan has been fully executed and all its tasks are complete, move it to `.claude/plans/_archive/`. This keeps the active plans folder clean and scannable. Multi-file plan directories (e.g., `recipe-system/`) get moved as a whole folder.
+1. **LLM Judgment, User Override** — Agent decides, user overrides. Cascade: plugin defaults → `.claude/chapterwise.local.md` → command variant → prompt language.
+2. **Clean Defaults, Rich Options** — Zero config first run.
+3. **Data Over Flare** — Progress messages include real data, no theatrical language. See `references/language-rules.md`.
 
 ## Conventions
 
-- **Commands** are markdown files with YAML frontmatter in `commands/`. Auto-discovered — no manifest registration needed.
+- **Commands** are markdown with YAML frontmatter in `commands/`. Auto-discovered.
 - **Scripts** use stdin/stdout JSON: `echo '{"key":"value"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/script.py`
-- **Never say "recipe" to the user.** The recipe system is internal only.
-- **Cooking verbs in progress messages** — scan, slice, source, distill, gather, assemble. Not metaphors — action verbs paired with technical nouns and real data.
-- **Validation after output** — run `codex_validator.py` after generating codex files, `recipe_validator.py` after saving recipes. Silent on success.
-- **User preferences** persist in `.claude/chapterwise.local.md` (in the user's project, not this repo). YAML frontmatter for config, markdown body for notes.
+- **Never say "recipe" to the user** — internal system only.
+- **Cooking verbs** — scan, slice, source, distill, gather, assemble. Action verbs with technical nouns and real data.
+- **Validation after output** — run `codex_validator.py` after generating codex, silent on success.
+- **User preferences** in `.claude/chapterwise.local.md` (user's project, not this repo).
 
 ## Modular Rules
 
-See `.claude/rules/` for topic-specific rules that load contextually when working with matching files.
+See `.claude/rules/` for topic-specific rules:
+- `commands.md` — command file structure, triggers, allowed tools
+- `scripts.md` — JSON stdin/stdout patterns, error handling
+- `testing.md` — pytest, TDD, structure mirroring
+- `codex-format.md` — Codex V1.2, Codex Lite, validation, schema resolution
+
+## Context
+
+- `.claude/context/` — internal architecture docs for this repo
+- `../../.claude/context/chapterwise-plugins.md` — cross-repo summary in parent
+- `../../.claude/references/chapterwise-plugins.md` — exhaustive reference in parent
+
+## Plans
+
+Plans are centralized in the parent workspace, NOT in this repo:
+- Active plans: `../../.claude/plans/plugins/`
+- Archives: `../../.claude/plans/plugins/_archive/`
+
+## Post-Plan Workflow
+
+After implementing any plan:
+1. Update `.claude/context/` files to reflect new reality
+2. Add dated one-liner to Recent Changes below
+3. Update parent context: `../../.claude/context/chapterwise-plugins.md`
+4. Archive the plan in `../../.claude/plans/plugins/_archive/`
+5. Update `../../.claude/STATUS.md` and `../../.claude/exec-order.md`
+
+## Recent Changes
+
+_Plugin is stable — no recent structural changes._
