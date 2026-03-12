@@ -59,6 +59,10 @@ Follow these steps in order for every insert operation.
 
 ### Step 1: Parse the Request
 
+**Pre-flight check:** Before proceeding, verify that `${CLAUDE_PLUGIN_ROOT}` resolves to a
+valid path containing the `scripts/` directory. If not, report an error:
+"Cannot find ChapterWise plugin scripts. Is the plugin installed correctly?"
+
 Determine the mode of operation:
 
 1. **Check for flags** in the user's command

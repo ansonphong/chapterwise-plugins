@@ -515,3 +515,46 @@ class TestInsertIntegration:
         assert result.success
         assert result.backup_path is not None
         assert os.path.exists(result.backup_path)
+
+
+class TestFallbackBehavior:
+    """Test that line-based fallback is used when ruamel is unavailable."""
+
+    def setup_method(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def teardown_method(self):
+        shutil.rmtree(self.tmpdir)
+
+    def test_falls_back_to_line_based_without_ruamel(self):
+        """When ruamel.yaml is not installed, line-based insertion is used."""
+        import unittest.mock
+
+        content = """type: chapter
+name: "Test"
+body: |
+  Line one.
+  Line two.
+children: []
+"""
+        path = os.path.join(self.tmpdir, 'test.codex.yaml')
+        with open(path, 'w') as f:
+            f.write(content)
+
+        engine = InsertEngine()
+
+        # Monkeypatch: make ruamel import fail inside _insert_codex
+        with unittest.mock.patch.dict('sys.modules', {'ruamel': None, 'ruamel.yaml': None}):
+            result = engine.insert(
+                file_path=path,
+                content="Fallback content.",
+                line_number=1,
+                insert_after=True,
+                create_backup=False,
+                add_markers=False
+            )
+
+        assert result.success
+        with open(path) as f:
+            output = f.read()
+        assert "Fallback content." in output
