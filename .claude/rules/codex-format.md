@@ -15,7 +15,7 @@ Applies when creating or modifying codex output files (`.codex.yaml`, `.codex.md
   "attributes": [{ "key": "name", "value": "val", "dataType": "string" }],
   "tags": ["keyword"],
   "children": [],
-  "relations": [{ "target": "other-id", "type": "references" }]
+  "relations": [{ "targetId": "other-id", "kind": "references" }]
 }
 ```
 

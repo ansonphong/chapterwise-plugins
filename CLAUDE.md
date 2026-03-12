@@ -10,7 +10,7 @@ This is the ChapterWise Claude Code plugin — a complete writing toolkit for ma
 plugins/chapterwise/
 ├── .claude-plugin/plugin.json   # Plugin manifest
 ├── commands/                    # Slash commands (YAML frontmatter + markdown)
-├── modules/                     # 31 analysis modules
+├── modules/                     # 32 analysis modules
 ├── scripts/                     # Python utilities (stdin JSON, stdout JSON)
 ├── patterns/                    # Format conversion patterns
 ├── templates/                   # Reader HTML templates
