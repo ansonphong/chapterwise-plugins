@@ -1,8 +1,11 @@
 {
-  "name": "chapterwise-codex",
-  "description": "Skills for creating, validating, and managing Chapterwise Codex documents",
-  "version": "1.0.0",
-  "homepage": "https://github.com/ansonphong/chapterwise-codex-claude",
-  "repository": "https://github.com/ansonphong/chapterwise-codex-claude",
+  "name": "chapterwise",
+  "description": "Complete writing toolkit for ChapterWise — import any manuscript, run AI analysis, build story atlases, generate research, create custom readers. Supports PDF, DOCX, Scrivener, Ulysses, Markdown, and more.",
+  "version": "2.0.0",
+  "author": {
+    "name": "Anson Phong"
+  },
+  "homepage": "https://chapterwise.app",
+  "repository": "https://github.com/ansonphong/chapterwise-claude-plugins",
   "license": "MIT"
 }
