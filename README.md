@@ -7,7 +7,7 @@ Complete writing toolkit for ChapterWise — import any manuscript, run AI analy
 ### Direct Install (Recommended)
 
 ```bash
-/plugin install --source github ansonphong/chapterwise-claude-plugins
+/plugin install --source github ansonphong/chapterwise-plugins
 ```
 
 ### Local Development
@@ -108,4 +108,4 @@ MIT License - see [LICENSE](LICENSE) file.
 ## Links
 
 - [ChapterWise App](https://chapterwise.app)
-- [Plugin Repository](https://github.com/ansonphong/chapterwise-claude-plugins)
+- [Plugin Repository](https://github.com/ansonphong/chapterwise-plugins)
