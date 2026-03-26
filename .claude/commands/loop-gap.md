@@ -6,8 +6,8 @@ Generate a `loop-gap.md` Ralph Loop prompt for any scope — plan directories, c
 
 ```
 # Plan directories (scan plan .md files for cross-reference consistency)
-/loop-gap .claude/plans/vace
-/loop-gap .claude/plans/new-image-pipelines
+/loop-gap plans/vace
+/loop-gap plans/new-image-pipelines
 
 # Code features (scan source code for a specific feature area)
 /loop-gap feature:licensing
@@ -31,7 +31,7 @@ Parse the arguments to determine which mode to use:
 
 | Argument Pattern | Mode | Description |
 |-----------------|------|-------------|
-| Path ending in `.claude/plans/*` or containing only `.md` files | **plan** | Scan plan docs for cross-reference consistency |
+| Path ending in `plans/*` or containing only `.md` files | **plan** | Scan plan docs for cross-reference consistency |
 | `feature:{name}` | **feature** | Scan all code related to a named feature |
 | `project` | **project** | Broad scan across the whole project |
 | Any other path(s) | **code** | Scan specific code directories/files |
@@ -55,7 +55,7 @@ Map the feature name to relevant directories using this lookup + any additional 
 | `settings` | `backend/settings.py`, `backend/api/routes/settings.py`, `frontend/src/lib/stores/settings.ts` |
 | Other | Glob for `**/*{feature_name}*` across `backend/` and `frontend/src/`, also check `backend/api/routes/`, `backend/tests/` |
 
-Collect all `.py`, `.ts`, `.svelte` files in those directories. Also include related plan files if they exist (`{.claude/plans/}/{feature}*`).
+Collect all `.py`, `.ts`, `.svelte` files in those directories. Also include related plan files if they exist (`{plans/}/{feature}*`).
 
 #### Code mode
 Glob all source files (`.py`, `.ts`, `.svelte`, `.rs`) in the specified paths. Include subdirectories.
@@ -101,9 +101,9 @@ Sort into:
 
 Determine output location:
 - **Plan mode:** `{TARGET_DIR}/loop-gap.md`
-- **Feature mode:** `.claude/plans/loop-gap-{feature_name}.md`
-- **Code mode:** `.claude/plans/loop-gap-{dirname}.md` (derived from first path argument)
-- **Project mode:** `.claude/plans/loop-gap-project.md`
+- **Feature mode:** `plans/loop-gap-{feature_name}.md`
+- **Code mode:** `plans/loop-gap-{dirname}.md` (derived from first path argument)
+- **Project mode:** `plans/loop-gap-project.md`
 
 Check if the file exists:
 - **Exists:** Read it. Compare file lists against discovery.

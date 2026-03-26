@@ -6,8 +6,8 @@ Take an existing plan (single file, multiple files, or directory) and restructur
 
 ```
 /meta-planner <path-to-plan>
-/meta-planner .claude/plans/my-feature/
-/meta-planner .claude/plans/2026-02-22-some-plan.md
+/meta-planner plans/my-feature/
+/meta-planner plans/2026-02-22-some-plan.md
 ```
 
 ## What This Skill Does
@@ -27,7 +27,7 @@ Take an existing plan (single file, multiple files, or directory) and restructur
 ## Output Structure
 
 ```
-.claude/plans/<plan-name>/
+plans/<plan-name>/
 ├── 00-master-plan.md                  ← Master checklist + ralph-loop command
 ├── YYYY-MM-DD-phase-1-*.md            ← Phase 1 tasks (detailed steps)
 ├── YYYY-MM-DD-phase-2-*.md            ← Phase 2 tasks
@@ -125,7 +125,7 @@ Create `00-master-plan.md` with this structure. **CRITICAL:** The master plan em
 Run this command to kick off Ralph Loop:
 
 ```
-/ralph-loop:ralph-loop "Execute .claude/plans/<plan-name>/00-master-plan.md" --completion-promise "ALL <FEATURE> TASKS COMPLETE" --max-iterations <N>
+/ralph-loop:ralph-loop "Execute plans/<plan-name>/00-master-plan.md" --completion-promise "ALL <FEATURE> TASKS COMPLETE" --max-iterations <N>
 ```
 
 **CRITICAL: The kickoff prompt MUST be a single short line referencing this file. Ralph reads all instructions from the file itself — NEVER put multi-line instructions in the kickoff prompt.**
@@ -225,7 +225,7 @@ When Ralph reads this file, follow these rules:
 ````
 
 **Master plan rules:**
-- **The ralph-loop kickoff prompt MUST be a single concise line** — just `"Execute .claude/plans/<plan-name>/00-master-plan.md"`. All execution logic goes in the "Execution Rules" section of the master plan file itself. Ralph does NOT parse multi-line kickoff prompts well.
+- **The ralph-loop kickoff prompt MUST be a single concise line** — just `"Execute plans/<plan-name>/00-master-plan.md"`. All execution logic goes in the "Execution Rules" section of the master plan file itself. Ralph does NOT parse multi-line kickoff prompts well.
 - `--max-iterations` = total number of tasks + checkpoints + 10 buffer (extra for review fix loops)
 - `--completion-promise` = `"ALL <FEATURE_NAME> TASKS COMPLETE"` (SCREAMING_CASE feature name)
 - Every task has: checkbox, bold task number, title, test command, file list
@@ -256,7 +256,7 @@ After creating all files, output:
 ```
 Plan restructured into ralph-loop format:
 
-Master plan: .claude/plans/<name>/00-master-plan.md
+Master plan: plans/<name>/00-master-plan.md
 Phase files: N files created
 Total tasks: N tasks + M checkpoints across P phases
 Quality gates: M test+review checkpoints embedded
@@ -340,7 +340,7 @@ Final:   pytest tests/ -v --timeout=120 + svelte-check (everything)
 
 **Output:**
 ```
-.claude/plans/add-widget/
+plans/add-widget/
 ├── 00-master-plan.md                          (checklist + ralph command)
 ├── 2026-02-22-phase-1-backend-model.md        (Tasks 0-2: Pydantic models)
 ├── 2026-02-22-phase-2-backend-api.md          (Tasks 3-5: API endpoints)

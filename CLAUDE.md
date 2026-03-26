@@ -56,8 +56,8 @@ See `.claude/rules/` for topic-specific rules:
 ## Plans
 
 Plans are centralized in the parent workspace, NOT in this repo:
-- Active plans: `../../.claude/plans/plugins/`
-- Archives: `../../.claude/plans/plugins/_archive/`
+- Active plans: `../../plans/plugins/`
+- Archives: `../../plans/plugins/_archive/`
 
 ## Post-Plan Workflow
 
@@ -65,7 +65,7 @@ After implementing any plan:
 1. Update `.claude/context/` files to reflect new reality
 2. Add dated one-liner to Recent Changes below
 3. Update parent context: `../../.claude/context/chapterwise-plugins.md`
-4. Archive the plan in `../../.claude/plans/plugins/_archive/`
+4. Archive the plan in `../../plans/plugins/_archive/`
 5. Update `../../.claude/STATUS.md` and `../../.claude/exec-order.md`
 
 ## Recent Changes
